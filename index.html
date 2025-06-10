@@ -1,1 +1,1027 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="/favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Web site created using create-react-app"/><link rel="apple-touch-icon" href="/logo192.png"/><link rel="manifest" href="/manifest.json"/><title>React App</title><script defer="defer" src="/static/js/main.c2f1aedc.js"></script><link href="/static/css/main.e6c13ad2.css" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Monitoring Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .controls-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .hospital-controls {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .hospital-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .hospital-selector label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+
+        .hospital-dropdown {
+            padding: 12px 40px 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            min-width: 200px;
+        }
+
+        .hospital-dropdown:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .select-wrapper::after {
+            content: '▼';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            pointer-events: none;
+            font-size: 0.8rem;
+        }
+
+        .add-hospital-btn {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #43a047, #66bb6a);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(67, 160, 71, 0.3);
+        }
+
+        .add-hospital-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 160, 71, 0.4);
+        }
+
+        .date-controls {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .date-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .date-group label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .date-input {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .date-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .refresh-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 30px;
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #c33;
+            display: none;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .no-hospital-message {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .hospital-info {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .user-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .user-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .user-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .user-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .user-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .duration {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .file-count {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .hospital-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .date-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .chart-wrapper {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Audio Monitoring Dashboard</h1>
+            <p>Track user audio uploads and analyze duration patterns</p>
+        </div>
+
+        <div class="controls-panel">
+            <div class="hospital-controls">
+                <div class="hospital-selector">
+                    <label for="hospitalSelect">Select Hospital</label>
+                    <div class="select-wrapper">
+                        <select id="hospitalSelect" class="hospital-dropdown">
+                            <option value="">Choose Hospital...</option>
+                            <option value="general-hospital">General Hospital</option>
+                            <option value="cardiac-center">Cardiac Center</option>
+                            <option value="pediatric-hospital">Pediatric Hospital</option>
+                            <option value="trauma-center">Trauma Center</option>
+                            <option value="rehabilitation-center">Rehabilitation Center</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="addHospitalBtn" class="add-hospital-btn">+ Add Hospital</button>
+            </div>
+            
+            <div class="date-controls">
+                <div class="date-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" class="date-input">
+                </div>
+                <div class="date-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate" class="date-input">
+                </div>
+                <button id="refreshData" class="refresh-btn">📊 Refresh Data</button>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalUsers">0</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalFiles">0</div>
+                <div class="stat-label">Total Files</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalDuration">0h</div>
+                <div class="stat-label">Total Duration</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="avgDuration">0m</div>
+                <div class="stat-label">Avg per User</div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div>📡 Loading audio data...</div>
+        </div>
+
+        <div class="error" id="error"></div>
+
+        <div id="hospitalInfo" class="hospital-info" style="display: none;"></div>
+
+        <div id="noHospitalMessage" class="no-hospital-message">
+            <h3>🏥 Select a Hospital</h3>
+            <p>Please select a hospital from the dropdown above to view audio monitoring data.</p>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">User Audio Duration Analysis</div>
+            <div class="chart-wrapper">
+                <canvas id="durationChart"></canvas>
+            </div>
+        </div>
+
+        <div class="user-list" id="userList"></div>
+    </div>
+
+    <!-- Add Hospital Modal -->
+    <div id="addHospitalModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">Add New Hospital</div>
+            <input type="text" id="hospitalNameInput" class="modal-input" placeholder="Enter hospital name...">
+            <div class="modal-buttons">
+                <button id="confirmAddHospital" class="modal-btn primary">Add Hospital</button>
+                <button id="cancelAddHospital" class="modal-btn secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - Using AWS Lambda Function URL
+        const API_CONFIG = {
+            baseUrl: 'https://blike2u2ckpj53v6wyklakq7ca0izxmp.lambda-url.us-east-1.on.aws/', // Replace with your Lambda Function URL
+            // No AWS credentials needed in frontend!
+        };
+
+        // Remove AWS SDK - we'll use presigned URLs from backend instead
+        let chartInstance = null;
+        let currentHospital = '';
+
+        // Hospital management
+        const hospitals = [
+            { value: 'general-hospital', name: 'General Hospital' },
+            { value: 'cardiac-center', name: 'Cardiac Center' },
+            { value: 'pediatric-hospital', name: 'Pediatric Hospital' },
+            { value: 'trauma-center', name: 'Trauma Center' },
+            { value: 'rehabilitation-center', name: 'Rehabilitation Center' }
+        ];
+
+        // API helper functions
+        async function apiRequest(endpoint, options = {}) {
+            const url = `${API_CONFIG.baseUrl}${endpoint}`;
+            const response = await fetch(url, {
+                method: 'POST', // Lambda function expects POST
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                },
+                body: JSON.stringify({
+                    action: endpoint.replace('/', ''), // Remove leading slash
+                    ...JSON.parse(options.body || '{}')
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status} ${response.statusText}`);
+            }
+            
+            return response.json();
+        }
+
+        // Initialize hospitals dropdown
+        function initializeHospitals() {
+            const select = document.getElementById('hospitalSelect');
+            select.innerHTML = '<option value="">Choose Hospital...</option>';
+            
+            hospitals.forEach(hospital => {
+                const option = document.createElement('option');
+                option.value = hospital.value;
+                option.textContent = hospital.name;
+                select.appendChild(option);
+            });
+        }
+
+        // Add new hospital
+        function addHospital(name) {
+            const folderName = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+            const hospital = { value: folderName, name: name };
+            
+            hospitals.push(hospital);
+            initializeHospitals();
+            
+            // Select the newly added hospital
+            document.getElementById('hospitalSelect').value = folderName;
+            currentHospital = folderName;
+            updateHospitalInfo();
+        }
+
+        // Update hospital info display
+        function updateHospitalInfo() {
+            const hospitalInfo = document.getElementById('hospitalInfo');
+            const noHospitalMessage = document.getElementById('noHospitalMessage');
+            
+            if (currentHospital) {
+                const hospital = hospitals.find(h => h.value === currentHospital);
+                hospitalInfo.textContent = `📊 Viewing data for: ${hospital ? hospital.name : currentHospital}`;
+                hospitalInfo.style.display = 'block';
+                noHospitalMessage.style.display = 'none';
+            } else {
+                hospitalInfo.style.display = 'none';
+                noHospitalMessage.style.display = 'block';
+            }
+        }
+
+        // Initialize date inputs with default values
+        function initializeDates() {
+            const today = new Date();
+            const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            document.getElementById('startDate').value = oneWeekAgo.toISOString().split('T')[0];
+        }
+
+        // Parse filename to extract user and date info
+        function parseFilename(filename) {
+            // Format: Anush76cardio_042517_3103426.wav
+            // Where 042517 is MMDDYY format
+            const match = filename.match(/^([^_]+)_(\d{6})_\d+\.wav$/);
+            if (!match) return null;
+
+            const [, username, dateStr] = match;
+            const month = parseInt(dateStr.substring(0, 2));
+            const day = parseInt(dateStr.substring(2, 4));
+            const year = 2000 + parseInt(dateStr.substring(4, 6));
+
+            return {
+                username,
+                date: new Date(year, month - 1, day)
+            };
+        }
+
+        // Get audio duration from presigned URL metadata
+        async function getAudioDuration(fileInfo) {
+            try {
+                // Try to get duration from backend-provided metadata first
+                if (fileInfo.duration) {
+                    return parseFloat(fileInfo.duration);
+                }
+                
+                // If no duration metadata, request it from backend
+                const response = await apiRequest('/audio-duration', {
+                    body: JSON.stringify({
+                        hospital: currentHospital,
+                        filename: fileInfo.filename
+                    })
+                });
+                
+                return response.duration || 0;
+            } catch (error) {
+                console.error('Error getting audio duration:', error);
+                
+                // Fallback: estimate from file size if provided
+                if (fileInfo.size) {
+                    const sizeInMB = fileInfo.size / (1024 * 1024);
+                    const estimatedDuration = (sizeInMB / 1.4) * 60; // seconds
+                    return estimatedDuration;
+                }
+                
+                return 0;
+            }
+        }
+
+        // Fetch and process audio data using backend API
+        async function fetchAudioData(startDate, endDate, hospitalFolder) {
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            
+            loading.classList.add('active');
+            error.classList.remove('active');
+
+            try {
+                // Request file list from backend API
+                const response = await apiRequest('/audio-list', {
+                    body: JSON.stringify({
+                        hospital: hospitalFolder,
+                        startDate: startDate.toISOString(),
+                        endDate: endDate.toISOString()
+                    })
+                });
+
+                const audioFiles = response.files || [];
+                const userStats = {};
+                let totalFiles = 0;
+                let totalDuration = 0;
+
+                for (const fileInfo of audioFiles) {
+                    const parsedInfo = parseFilename(fileInfo.filename);
+                    if (!parsedInfo) continue;
+
+                    const { username, date } = parsedInfo;
+                    
+                    // Check if file is within date range (double-check on frontend)
+                    if (date >= startDate && date <= endDate) {
+                        const duration = await getAudioDuration(fileInfo);
+                        
+                        if (!userStats[username]) {
+                            userStats[username] = {
+                                totalDuration: 0,
+                                fileCount: 0,
+                                files: []
+                            };
+                        }
+                        
+                        userStats[username].totalDuration += duration;
+                        userStats[username].fileCount += 1;
+                        userStats[username].files.push({
+                            filename: fileInfo.filename,
+                            duration: duration,
+                            date: date,
+                            presignedUrl: fileInfo.presignedUrl // For potential audio playback
+                        });
+                        
+                        totalFiles++;
+                        totalDuration += duration;
+                    }
+                }
+
+                return { userStats, totalFiles, totalDuration };
+            } catch (err) {
+                console.error('Error fetching data:', err);
+                error.textContent = `Error loading data: ${err.message}`;
+                error.classList.add('active');
+                return { userStats: {}, totalFiles: 0, totalDuration: 0 };
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+
+        // Update statistics display
+        function updateStats(userStats, totalFiles, totalDuration) {
+            const totalUsers = Object.keys(userStats).length;
+            const avgDuration = totalUsers > 0 ? totalDuration / totalUsers : 0;
+
+            document.getElementById('totalUsers').textContent = totalUsers;
+            document.getElementById('totalFiles').textContent = totalFiles.toLocaleString();
+            document.getElementById('totalDuration').textContent = `${Math.round(totalDuration / 3600)}h`;
+            document.getElementById('avgDuration').textContent = `${Math.round(avgDuration / 60)}m`;
+        }
+
+        // Create or update chart
+        function updateChart(userStats) {
+            const ctx = document.getElementById('durationChart').getContext('2d');
+            
+            // Prepare data for chart
+            const users = Object.keys(userStats).sort((a, b) => 
+                userStats[b].totalDuration - userStats[a].totalDuration
+            );
+            
+            const durations = users.map(user => Math.round(userStats[user].totalDuration / 60)); // in minutes
+            
+            // Generate colors
+            const colors = users.map((_, index) => {
+                const hue = (index * 137.5) % 360;
+                return `hsla(${hue}, 70%, 60%, 0.8)`;
+            });
+
+            // Destroy existing chart
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: users,
+                    datasets: [{
+                        label: 'Duration (minutes)',
+                        data: durations,
+                        backgroundColor: colors,
+                        borderColor: colors.map(color => color.replace('0.8', '1')),
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const username = context.label;
+                                    const duration = context.raw;
+                                    const fileCount = userStats[username].fileCount;
+                                    return [
+                                        `Duration: ${duration} minutes`,
+                                        `Files: ${fileCount}`,
+                                        `Avg per file: ${Math.round(duration / fileCount)} min`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Duration (minutes)'
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Users'
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create user cards
+        function createUserCards(userStats) {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+
+            const sortedUsers = Object.entries(userStats).sort((a, b) => 
+                b[1].totalDuration - a[1].totalDuration
+            );
+
+            sortedUsers.forEach(([username, stats]) => {
+                const card = document.createElement('div');
+                card.className = 'user-card';
+                
+                const durationMinutes = Math.round(stats.totalDuration / 60);
+                const durationHours = Math.floor(durationMinutes / 60);
+                const remainingMinutes = durationMinutes % 60;
+                
+                const displayDuration = durationHours > 0 
+                    ? `${durationHours}h ${remainingMinutes}m`
+                    : `${durationMinutes}m`;
+
+                card.innerHTML = `
+                    <div class="user-name">${username}</div>
+                    <div class="user-stats">
+                        <div class="duration">${displayDuration}</div>
+                        <div class="file-count">${stats.fileCount} files</div>
+                    </div>
+                `;
+                
+                userList.appendChild(card);
+            });
+        }
+
+        // Main refresh function
+        async function refreshData() {
+            if (!currentHospital) {
+                alert('Please select a hospital first');
+                return;
+            }
+
+            const startDateStr = document.getElementById('startDate').value;
+            const endDateStr = document.getElementById('endDate').value;
+            
+            if (!startDateStr || !endDateStr) {
+                alert('Please select both start and end dates');
+                return;
+            }
+
+            const startDate = new Date(startDateStr);
+            const endDate = new Date(endDateStr);
+            endDate.setHours(23, 59, 59, 999); // Include the entire end date
+
+            const { userStats, totalFiles, totalDuration } = await fetchAudioData(startDate, endDate, currentHospital);
+            
+            updateStats(userStats, totalFiles, totalDuration);
+            updateChart(userStats);
+            createUserCards(userStats);
+        }
+
+        // Event listeners
+        document.getElementById('refreshData').addEventListener('click', refreshData);
+        
+        document.getElementById('hospitalSelect').addEventListener('change', function() {
+            currentHospital = this.value;
+            updateHospitalInfo();
+            
+            // Clear previous data when switching hospitals
+            if (currentHospital) {
+                document.getElementById('totalUsers').textContent = '0';
+                document.getElementById('totalFiles').textContent = '0';
+                document.getElementById('totalDuration').textContent = '0h';
+                document.getElementById('avgDuration').textContent = '0m';
+                document.getElementById('userList').innerHTML = '';
+                
+                if (chartInstance) {
+                    chartInstance.destroy();
+                    chartInstance = null;
+                }
+            }
+        });
+
+        // Add Hospital Modal functionality
+        document.getElementById('addHospitalBtn').addEventListener('click', function() {
+            document.getElementById('addHospitalModal').classList.add('active');
+            document.getElementById('hospitalNameInput').focus();
+        });
+
+        document.getElementById('cancelAddHospital').addEventListener('click', function() {
+            document.getElementById('addHospitalModal').classList.remove('active');
+            document.getElementById('hospitalNameInput').value = '';
+        });
+
+        document.getElementById('confirmAddHospital').addEventListener('click', function() {
+            const hospitalName = document.getElementById('hospitalNameInput').value.trim();
+            if (hospitalName) {
+                addHospital(hospitalName);
+                document.getElementById('addHospitalModal').classList.remove('active');
+                document.getElementById('hospitalNameInput').value = '';
+            } else {
+                alert('Please enter a hospital name');
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('addHospitalModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+                document.getElementById('hospitalNameInput').value = '';
+            }
+        });
+
+        // Enter key support for modal
+        document.getElementById('hospitalNameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('confirmAddHospital').click();
+            }
+        });
+
+        // Initialize
+        initializeHospitals();
+        initializeDates();
+        updateHospitalInfo();
+        
+        // Show demo data message
+        setTimeout(() => {
+            const error = document.getElementById('error');
+            error.innerHTML = `
+                <strong>AWS Lambda Function Required:</strong> This dashboard uses a single Lambda function with Function URL.
+                <br><br>
+                <strong>Lambda Function Actions:</strong>
+                <ul style="margin-top: 10px; text-align: left;">
+                    <li><strong>audio-list</strong> - List audio files for a hospital and date range</li>
+                    <li><strong>audio-duration</strong> - Get audio file duration</li>
+                </ul>
+                <br>
+                <strong>Expected Request/Response Format:</strong>
+                <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.9rem;">
+// Request for audio-list
+{
+  "action": "audio-list",
+  "hospital": "general-hospital",
+  "startDate": "2025-04-20T00:00:00Z",
+  "endDate": "2025-04-27T23:59:59Z"
+}
+
+// Response
+{
+  "files": [
+    {
+      "filename": "Anush76cardio_042517_3103426.wav",
+      "size": 114688,
+      "duration": 45.2,
+      "lastModified": "2025-04-25T17:51:45Z",
+      "presignedUrl": "https://s3.amazonaws.com/..."
+    }
+  ]
+}
+
+// Request for audio-duration
+{
+  "action": "audio-duration",
+  "hospital": "general-hospital",
+  "filename": "Anush76cardio_042517_3103426.wav"
+}
+
+// Response
+{
+  "duration": 45.2
+}
+                </pre>
+                <br>
+                <strong>Setup Steps:</strong>
+                <ol style="margin-top: 10px; text-align: left;">
+                    <li>🚀 Deploy the Lambda function with S3 permissions</li>
+                    <li>🔗 Create a Function URL (public access)</li>
+                    <li>📝 Update API_CONFIG.baseUrl with your Function URL</li>
+                    <li>📁 Ensure S3 bucket has hospital folders with WAV files</li>
+                </ol>
+                <br>
+                <strong>Benefits:</strong>
+                <ul style="margin-top: 10px; text-align: left;">
+                    <li>💰 Pay only when used (no always-on server costs)</li>
+                    <li>🔒 Secure - no AWS credentials in frontend</li>
+                    <li>⚡ Auto-scaling with zero maintenance</li>
+                    <li>🌐 Public URL - no API Gateway needed</li>
+                </ul>
+            `;
+            error.classList.add('active');
+        }, 1000);
+    </script>
+</body>
+</html>
