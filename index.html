@@ -452,11 +452,11 @@
                     <div class="select-wrapper">
                         <select id="hospitalSelect" class="hospital-dropdown">
                             <option value="">Choose Hospital...</option>
-                            <option value="Erebuni">Erebuni</option>
-                            <option value="Onco">Onco</option>
-                            <option value="Astghik">Astghik</option>
-                            <!-- <option value="trauma-center">Trauma Center</option>
-                            <option value="rehabilitation-center">Rehabilitation Center</option> -->
+                            <option value="general-hospital">General Hospital</option>
+                            <option value="cardiac-center">Cardiac Center</option>
+                            <option value="pediatric-hospital">Pediatric Hospital</option>
+                            <option value="trauma-center">Trauma Center</option>
+                            <option value="rehabilitation-center">Rehabilitation Center</option>
                         </select>
                     </div>
                 </div>
@@ -533,7 +533,7 @@
     <script>
         // Configuration - Using AWS Lambda Function URL
         const API_CONFIG = {
-            baseUrl: 'https://blike2u2ckpj53v6wyklakq7ca0izxmp.lambda-url.us-east-1.on.aws/', // Replace with your Lambda Function URL
+            baseUrl: 'https://blike2u2ckpj53v6wyklakq7ca0izxmp.lambda-url.us-east-1.on.aws', // No trailing slash!
             // No AWS credentials needed in frontend!
         };
 
@@ -543,30 +543,35 @@
 
         // Hospital management
         const hospitals = [
-            { value: 'Erebuni', name: 'Erebuni hospital' },
-            { value: 'Onco', name: 'Onco hospital' },
-            { value: 'Astghik', name: 'Astghik hospital' },
+            { value: 'general-hospital', name: 'General Hospital' },
+            { value: 'cardiac-center', name: 'Cardiac Center' },
+            { value: 'pediatric-hospital', name: 'Pediatric Hospital' },
             { value: 'trauma-center', name: 'Trauma Center' },
             { value: 'rehabilitation-center', name: 'Rehabilitation Center' }
         ];
 
         // API helper functions
         async function apiRequest(endpoint, options = {}) {
-            const url = `${API_CONFIG.baseUrl}${endpoint}`;
+            // Remove leading slash and ensure no double slashes
+            const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
+            const url = API_CONFIG.baseUrl + (cleanEndpoint ? '/' + cleanEndpoint : '');
+            
+            console.log('Making request to:', url); // Debug log
+            
             const response = await fetch(url, {
-                method: 'POST', // Lambda function expects POST
+                method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    ...options.headers
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    action: endpoint.replace('/', ''), // Remove leading slash
+                    action: cleanEndpoint,
                     ...JSON.parse(options.body || '{}')
                 })
             });
             
             if (!response.ok) {
-                throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                const errorText = await response.text();
+                throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
             }
             
             return response.json();
@@ -651,7 +656,7 @@
                 }
                 
                 // If no duration metadata, request it from backend
-                const response = await apiRequest('/audio-duration', {
+                const response = await apiRequest('audio-duration', {
                     body: JSON.stringify({
                         hospital: currentHospital,
                         filename: fileInfo.filename
@@ -683,7 +688,7 @@
 
             try {
                 // Request file list from backend API
-                const response = await apiRequest('/audio-list', {
+                const response = await apiRequest('audio-list', {
                     body: JSON.stringify({
                         hospital: hospitalFolder,
                         startDate: startDate.toISOString(),
@@ -973,7 +978,7 @@
 // Request for audio-list
 {
   "action": "audio-list",
-  "hospital": "Erebuni",
+  "hospital": "general-hospital",
   "startDate": "2025-04-20T00:00:00Z",
   "endDate": "2025-04-27T23:59:59Z"
 }
@@ -994,7 +999,7 @@
 // Request for audio-duration
 {
   "action": "audio-duration",
-  "hospital": "Erebuni",
+  "hospital": "general-hospital",
   "filename": "Anush76cardio_042517_3103426.wav"
 }
 
