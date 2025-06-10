@@ -452,11 +452,11 @@
                     <div class="select-wrapper">
                         <select id="hospitalSelect" class="hospital-dropdown">
                             <option value="">Choose Hospital...</option>
-                            <option value="general-hospital">General Hospital</option>
-                            <option value="cardiac-center">Cardiac Center</option>
-                            <option value="pediatric-hospital">Pediatric Hospital</option>
-                            <option value="trauma-center">Trauma Center</option>
-                            <option value="rehabilitation-center">Rehabilitation Center</option>
+                            <option value="Erebuni">Erebuni Hospital</option>
+                            <option value="Onco">Onco Hospital</option>
+                            <option value="Astghik">Astghik Hospital</option>
+                            <!-- <option value="trauma-center">Trauma Center</option>
+                            <option value="rehabilitation-center">Rehabilitation Center</option> -->
                         </select>
                     </div>
                 </div>
@@ -543,11 +543,11 @@
 
         // Hospital management
         const hospitals = [
-            { value: 'general-hospital', name: 'General Hospital' },
-            { value: 'cardiac-center', name: 'Cardiac Center' },
-            { value: 'pediatric-hospital', name: 'Pediatric Hospital' },
-            { value: 'trauma-center', name: 'Trauma Center' },
-            { value: 'rehabilitation-center', name: 'Rehabilitation Center' }
+            { value: 'Erebuni', name: 'Erebuni Hospital' },
+            { value: 'Onco', name: 'Onco Hospital' },
+            { value: 'Astghik', name: 'Astghik Hospital' },
+            // { value: 'trauma-center', name: 'Trauma Center' },
+            // { value: 'rehabilitation-center', name: 'Rehabilitation Center' }
         ];
 
         // API helper functions
@@ -978,7 +978,7 @@
 // Request for audio-list
 {
   "action": "audio-list",
-  "hospital": "general-hospital",
+  "hospital": "Erebuni",
   "startDate": "2025-04-20T00:00:00Z",
   "endDate": "2025-04-27T23:59:59Z"
 }
@@ -999,7 +999,7 @@
 // Request for audio-duration
 {
   "action": "audio-duration",
-  "hospital": "general-hospital",
+  "hospital": "Erebuni",
   "filename": "Anush76cardio_042517_3103426.wav"
 }
 
