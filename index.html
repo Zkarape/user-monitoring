@@ -629,7 +629,7 @@
         function parseFilename(filename) {
             const match = filename.match(/^([^_]+)_(\d{5})_\d+\.wav$/i);
             if (!match) {
-                console.warn('Invalid filename format:', filename, match);
+                console.warn('Invalid filename format:', filename);
                 return null;
             }
             const [, username, dateStr] = match;
@@ -637,8 +637,7 @@
             const month = parseInt(dateStr.substring(0, 2));
             const day = parseInt(dateStr.substring(2, 4));
             const hour = parseInt(dateStr.substring(4, 5));
-            // Assume year 2025 for consistency with date range
-            const year = 2025;
+            const year = 2025; // Hardcode for 2025
             const date = new Date(year, month - 1, day, hour);
             if (isNaN(date.getTime())) {
                 console.warn('Invalid date parsed from filename:', filename, { month, day, hour, year });
@@ -647,7 +646,7 @@
             console.log('Parsed date:', { filename, date: date.toISOString() }); // Debug
             return { username, date };
         }
-
+        
         // Get audio duration from presigned URL metadata
         async function getAudioDuration(fileInfo) {
             try {
