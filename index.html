@@ -556,10 +556,10 @@
             const url = API_CONFIG.baseUrl + (cleanEndpoint ? '/' + cleanEndpoint : '');
             console.log('Making request to:', url);
             const body = {
-                action: cleanEndpoint,
-                ...options.body // Pass body as object, not string
+            action: cleanEndpoint,
+            ...options.body // Use plain object
             };
-            console.log('Request body:', body);
+            console.log('Request body:', body); // Debug log
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -571,6 +571,7 @@
             }
             return response.json();
         }
+
 
         // Initialize hospitals dropdown
         function initializeHospitals() {
@@ -626,22 +627,23 @@
 
         // Parse filename to extract user and date info
         function parseFilename(filename) {
-            // Format: Anush76cardio_042517_3103426.wav
-            // Where 042517 is MMDDYY format
-            const match = filename.match(/^([^_]+)_(\d{6})_\d+\.wav$/);
-            if (!match) return null;
-
+            const match = filename.match(/^([^_]+)_(\d{6})_\d+\.wav$/i);
+            if (!match) {
+                console.warn('Invalid filename format:', filename);
+                return null;
+            }
             const [, username, dateStr] = match;
             const month = parseInt(dateStr.substring(0, 2));
             const day = parseInt(dateStr.substring(2, 4));
             const year = 2000 + parseInt(dateStr.substring(4, 6));
-
-            return {
-                username,
-                date: new Date(year, month - 1, day)
-            };
-        }
-
+            const date = new Date(year, month - 1, day);
+            if (isNaN(date.getTime())) {
+                console.warn('Invalid date parsed from filename:', filename);
+                return null;
+            }
+            return { username, date };
+        }     
+        
         // Get audio duration from presigned URL metadata
         async function getAudioDuration(fileInfo) {
             try {
@@ -695,7 +697,46 @@
                 console.log('API Response:', response);
                 const audioFiles = response.files || [];
                 console.log('Audio Files:', audioFiles);
-                // ... rest of the function
+
+                const userStats = {};
+                let totalFiles = 0;
+                let totalDuration = 0;
+
+                for (const fileInfo of audioFiles) {
+                    const parsedInfo = parseFilename(fileInfo.filename);
+                    console.log('Parsed File:', fileInfo.filename, parsedInfo);
+                    if (!parsedInfo) continue;
+
+                    const { username, date } = parsedInfo;
+                    
+                    if (date >= startDate && date <= endDate) {
+                        const duration = await getAudioDuration(fileInfo);
+                        console.log('File Duration:', fileInfo.filename, duration);
+                        
+                        if (!userStats[username]) {
+                            userStats[username] = {
+                                totalDuration: 0,
+                                fileCount: 0,
+                                files: []
+                            };
+                        }
+                        
+                        userStats[username].totalDuration += duration;
+                        userStats[username].fileCount += 1;
+                        userStats[username].files.push({
+                            filename: fileInfo.filename,
+                            duration: duration,
+                            date: date,
+                            presignedUrl: fileInfo.presignedUrl
+                        });
+                        
+                        totalFiles++;
+                        totalDuration += duration;
+                    }
+                }
+
+                console.log('Processed Data:', { userStats, totalFiles, totalDuration });
+                return { userStats, totalFiles, totalDuration };
             } catch (err) {
                 console.error('Error fetching data:', err);
                 error.textContent = `Error loading data: ${err.message}`;
@@ -705,7 +746,6 @@
                 loading.classList.remove('active');
             }
         }
-
 
         // Update statistics display
         function updateStats(userStats, totalFiles, totalDuration) {
@@ -854,16 +894,23 @@
 
             console.log('Starting refresh with:', { currentHospital, startDate, endDate });
             try {
-                const { userStats, totalFiles, totalDuration } = await fetchAudioData(startDate, endDate, currentHospital);
+                const result = await fetchAudioData(startDate, endDate, currentHospital);
+                if (!result) {
+                    throw new Error('fetchAudioData returned undefined');
+                }
+                const { userStats, totalFiles, totalDuration } = result;
                 console.log('Updating UI with:', { userStats, totalFiles, totalDuration });
                 if (Object.keys(userStats).length === 0) {
                     document.getElementById('error').textContent = 'No audio files found for the selected hospital and date range';
                     document.getElementById('error').classList.add('active');
+                } else {
+                    document.getElementById('error').classList.remove('active');
                 }
                 updateStats(userStats, totalFiles, totalDuration);
                 updateChart(userStats);
                 createUserCards(userStats);
             } catch (err) {
+                console.error('Refresh error:', err);
                 document.getElementById('error').textContent = `Failed to refresh data: ${err.message}`;
                 document.getElementById('error').classList.add('active');
             }
