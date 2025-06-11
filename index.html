@@ -680,8 +680,13 @@
 
         // Fetch and process audio data using backend API
         async function fetchAudioData(startDate, endDate, hospitalFolder) {
-            const loading = document.getElementById('loadingId');
-            const error = document.getElementById('errorId');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            
+            if (!loading || !error) {
+                console.error('DOM elements missing:', { loading, error });
+                throw new Error('Required DOM elements (loading or error) not found');
+            }
             
             loading.classList.add('active');
             error.classList.remove('active');
@@ -708,12 +713,12 @@
                         throw new Error('Invalid API response: files array missing');
                     }
                     allFiles = allFiles.concat(response.files);
-                    console.log('Fetched audio files:', allFiles.length, ' Total available:', response.totalAvailable);
+                    console.log('Fetched audio files:', allFiles.length, 'Total available:', response.totalAvailable);
                     hasMore = response.hasMore || false;
                     offset += response.limit || limit;
                 }
 
-                console.log('All Audio Files:', allFiles);
+                console.log('All Audio Files:', allFiles.length);
 
                 const userStats = {};
                 let totalFiles = 0;
@@ -767,7 +772,6 @@
                 loading.classList.remove('active');
             }
         }
-
 
         // Create or update chart
         function updateChart(userStats) {
