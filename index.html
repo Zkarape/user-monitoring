@@ -552,28 +552,23 @@
 
         // API helper functions
         async function apiRequest(endpoint, options = {}) {
-            // Remove leading slash and ensure no double slashes
             const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
             const url = API_CONFIG.baseUrl + (cleanEndpoint ? '/' + cleanEndpoint : '');
-            
-            console.log('Making request to:', url); // Debug log
-            
+            console.log('Making request to:', url);
+            const body = {
+                action: cleanEndpoint,
+                ...options.body // Pass body as object, not string
+            };
+            console.log('Request body:', body);
             const response = await fetch(url, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    action: cleanEndpoint,
-                    ...JSON.parse(options.body || '{}')
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
             });
-            
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
             }
-            
             return response.json();
         }
 
@@ -687,53 +682,20 @@
             error.classList.remove('active');
 
             try {
-                // Request file list from backend API
+                console.log('Fetching data for:', { hospitalFolder, startDate, endDate });
                 const response = await apiRequest('audio-list', {
-                    body: JSON.stringify({
+                    body: {
                         hospital: hospitalFolder,
                         startDate: startDate.toISOString(),
-                        endDate: endDate.toISOString()
-                    })
-                });
-
-                const audioFiles = response.files || [];
-                const userStats = {};
-                let totalFiles = 0;
-                let totalDuration = 0;
-
-                for (const fileInfo of audioFiles) {
-                    const parsedInfo = parseFilename(fileInfo.filename);
-                    if (!parsedInfo) continue;
-
-                    const { username, date } = parsedInfo;
-                    
-                    // Check if file is within date range (double-check on frontend)
-                    if (date >= startDate && date <= endDate) {
-                        const duration = await getAudioDuration(fileInfo);
-                        
-                        if (!userStats[username]) {
-                            userStats[username] = {
-                                totalDuration: 0,
-                                fileCount: 0,
-                                files: []
-                            };
-                        }
-                        
-                        userStats[username].totalDuration += duration;
-                        userStats[username].fileCount += 1;
-                        userStats[username].files.push({
-                            filename: fileInfo.filename,
-                            duration: duration,
-                            date: date,
-                            presignedUrl: fileInfo.presignedUrl // For potential audio playback
-                        });
-                        
-                        totalFiles++;
-                        totalDuration += duration;
+                        endDate: endDate.toISOString(),
+                        limit: 100,
+                        offset: 0
                     }
-                }
-
-                return { userStats, totalFiles, totalDuration };
+                });
+                console.log('API Response:', response);
+                const audioFiles = response.files || [];
+                console.log('Audio Files:', audioFiles);
+                // ... rest of the function
             } catch (err) {
                 console.error('Error fetching data:', err);
                 error.textContent = `Error loading data: ${err.message}`;
@@ -743,6 +705,7 @@
                 loading.classList.remove('active');
             }
         }
+
 
         // Update statistics display
         function updateStats(userStats, totalFiles, totalDuration) {
@@ -877,7 +840,6 @@
                 alert('Please select a hospital first');
                 return;
             }
-
             const startDateStr = document.getElementById('startDate').value;
             const endDateStr = document.getElementById('endDate').value;
             
@@ -888,13 +850,23 @@
 
             const startDate = new Date(startDateStr);
             const endDate = new Date(endDateStr);
-            endDate.setHours(23, 59, 59, 999); // Include the entire end date
+            endDate.setHours(23, 59, 59, 999);
 
-            const { userStats, totalFiles, totalDuration } = await fetchAudioData(startDate, endDate, currentHospital);
-            
-            updateStats(userStats, totalFiles, totalDuration);
-            updateChart(userStats);
-            createUserCards(userStats);
+            console.log('Starting refresh with:', { currentHospital, startDate, endDate });
+            try {
+                const { userStats, totalFiles, totalDuration } = await fetchAudioData(startDate, endDate, currentHospital);
+                console.log('Updating UI with:', { userStats, totalFiles, totalDuration });
+                if (Object.keys(userStats).length === 0) {
+                    document.getElementById('error').textContent = 'No audio files found for the selected hospital and date range';
+                    document.getElementById('error').classList.add('active');
+                }
+                updateStats(userStats, totalFiles, totalDuration);
+                updateChart(userStats);
+                createUserCards(userStats);
+            } catch (err) {
+                document.getElementById('error').textContent = `Failed to refresh data: ${err.message}`;
+                document.getElementById('error').classList.add('active');
+            }
         }
 
         // Event listeners
