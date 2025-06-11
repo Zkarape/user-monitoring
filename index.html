@@ -556,14 +556,14 @@
             const url = API_CONFIG.baseUrl + (cleanEndpoint ? '/' + cleanEndpoint : '');
             console.log('Making request to:', url);
             const body = {
-            action: cleanEndpoint,
-            ...options.body // Use plain object
+                action: cleanEndpoint,
+                ...options.body // Pass body as object
             };
-            console.log('Request body:', body); // Debug log
+            console.log('Request body:', body);
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
+                body: JSON.stringify(body) // Stringify once
             });
             if (!response.ok) {
                 const errorText = await response.text();
@@ -642,8 +642,8 @@
                 return null;
             }
             return { username, date };
-        }     
-        
+        }
+
         // Get audio duration from presigned URL metadata
         async function getAudioDuration(fileInfo) {
             try {
@@ -695,7 +695,10 @@
                     }
                 });
                 console.log('API Response:', response);
-                const audioFiles = response.files || [];
+                if (!response || !Array.isArray(response.files)) {
+                    throw new Error('Invalid API response: files array missing');
+                }
+                const audioFiles = response.files;
                 console.log('Audio Files:', audioFiles);
 
                 const userStats = {};
@@ -887,6 +890,10 @@
                 alert('Please select both start and end dates');
                 return;
             }
+            if (new Date(startDateStr) > new Date(endDateStr)) {
+                alert('Start date must be before end date');
+                return;
+            }
 
             const startDate = new Date(startDateStr);
             const endDate = new Date(endDateStr);
@@ -915,7 +922,6 @@
                 document.getElementById('error').classList.add('active');
             }
         }
-
         // Event listeners
         document.getElementById('refreshData').addEventListener('click', refreshData);
         
