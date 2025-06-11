@@ -269,6 +269,76 @@
             color: #666;
             font-weight: 500;
         }
+        .pagination-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            text-align: center;
+            display: none;
+        }
+        .pagination-panel.active {
+            display: block;
+        }
+        .pagination-info {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .pagination-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        .pagination-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .pagination-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .load-more-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            animation: pulse-glow 2s infinite;
+        }
+        .load-more-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3); }
+            50% { box-shadow: 0 4px 20px rgba(255, 107, 53, 0.5); }
+            100% { box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3); }
+        }
         .chart-container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -493,6 +563,10 @@
             .chart-wrapper {
                 height: 300px;
             }
+            
+            .pagination-controls {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -564,6 +638,21 @@
             <div class="progress-grid" id="progressGrid"></div>
         </div>
         
+        <!-- Pagination Panel -->
+        <div class="pagination-panel" id="paginationPanel">
+            <div class="pagination-info" id="paginationInfo">
+                Showing page 1 of 1 (0 total files)
+            </div>
+            <div class="pagination-controls">
+                <button id="firstPageBtn" class="pagination-btn">First</button>
+                <button id="prevPageBtn" class="pagination-btn">Previous</button>
+                <span id="pageNumbers" style="margin: 0 15px; font-weight: 600;"></span>
+                <button id="nextPageBtn" class="pagination-btn">Next</button>
+                <button id="lastPageBtn" class="pagination-btn">Last</button>
+                <button id="loadMoreBtn" class="load-more-btn" style="margin-left: 20px;">📄 Load More Files</button>
+            </div>
+        </div>
+        
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number" id="totalUsers">0</div>
@@ -571,15 +660,15 @@
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="totalFiles">0</div>
-                <div class="stat-label">Total Files</div>
+                <div class="stat-label">Files This Page</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalAvailable">0</div>
+                <div class="stat-label">Total Available</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="totalDuration">0h</div>
                 <div class="stat-label">Total Duration</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="avgDuration">0m</div>
-                <div class="stat-label">Avg per User</div>
             </div>
         </div>
         
@@ -623,6 +712,14 @@
         
         let chartInstance = null;
         let currentHospital = '';
+        let currentPagination = {
+            currentPage: 1,
+            totalPages: 1,
+            totalFiles: 0,
+            hasMore: false,
+            pageSize: 100
+        };
+        let allUserStats = {}; // Accumulated stats across all pages
         
         // Hospital management
         const hospitals = [
@@ -731,10 +828,59 @@
                     // No additional controls needed
                     break;
             }
+            
+            // Reset pagination when changing modes
+            resetPagination();
         });
         
-        // MULTI-USER OPTIMIZED: Handle different processing modes
-        async function fetchAudioData(startDate, endDate, hospitalFolder) {
+        // Reset pagination state
+        function resetPagination() {
+            currentPagination = {
+                currentPage: 1,
+                totalPages: 1,
+                totalFiles: 0,
+                hasMore: false,
+                pageSize: 100
+            };
+            allUserStats = {};
+            updatePaginationUI();
+        }
+        
+        // Update pagination UI
+        function updatePaginationUI() {
+            const paginationPanel = document.getElementById('paginationPanel');
+            const paginationInfo = document.getElementById('paginationInfo');
+            const pageNumbers = document.getElementById('pageNumbers');
+            const firstBtn = document.getElementById('firstPageBtn');
+            const prevBtn = document.getElementById('prevPageBtn');
+            const nextBtn = document.getElementById('nextPageBtn');
+            const lastBtn = document.getElementById('lastPageBtn');
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            
+            if (currentPagination.totalFiles > 0) {
+                paginationPanel.classList.add('active');
+                
+                const startIndex = ((currentPagination.currentPage - 1) * currentPagination.pageSize) + 1;
+                const endIndex = Math.min(currentPagination.currentPage * currentPagination.pageSize, currentPagination.totalFiles);
+                
+                paginationInfo.textContent = `Showing ${startIndex}-${endIndex} of ${currentPagination.totalFiles} files (Page ${currentPagination.currentPage} of ${currentPagination.totalPages})`;
+                pageNumbers.textContent = `Page ${currentPagination.currentPage} of ${currentPagination.totalPages}`;
+                
+                // Enable/disable buttons
+                firstBtn.disabled = currentPagination.currentPage <= 1;
+                prevBtn.disabled = currentPagination.currentPage <= 1;
+                nextBtn.disabled = !currentPagination.hasMore;
+                lastBtn.disabled = !currentPagination.hasMore;
+                
+                // Show load more button if there are more pages
+                loadMoreBtn.style.display = currentPagination.hasMore ? 'inline-block' : 'none';
+            } else {
+                paginationPanel.classList.remove('active');
+            }
+        }
+        
+        // ENHANCED: Handle different processing modes with pagination
+        async function fetchAudioData(startDate, endDate, hospitalFolder, page = 1, loadMore = false) {
             const loading = document.getElementById('loading');
             const error = document.getElementById('error');
             const processingInfo = document.getElementById('processingInfo');
@@ -747,19 +893,19 @@
             
             try {
                 const usernameMode = document.getElementById('usernameMode').value;
-                console.log('Fetching with mode:', { hospitalFolder, startDate, endDate, usernameMode });
+                console.log('Fetching with mode:', { hospitalFolder, startDate, endDate, usernameMode, page, loadMore });
                 
                 let response;
                 
                 switch (usernameMode) {
                     case 'single':
-                        response = await fetchSingleUser(hospitalFolder, startDate, endDate);
+                        response = await fetchSingleUser(hospitalFolder, startDate, endDate, page);
                         break;
                     case 'multiple':
-                        response = await fetchMultipleUsers(hospitalFolder, startDate, endDate);
+                        response = await fetchMultipleUsers(hospitalFolder, startDate, endDate, page);
                         break;
                     case 'all':
-                        response = await fetchAllUsers(hospitalFolder, startDate, endDate);
+                        response = await fetchAllUsers(hospitalFolder, startDate, endDate, page);
                         break;
                     default:
                         throw new Error('Invalid username mode');
@@ -771,11 +917,22 @@
                     throw new Error('Invalid API response: files array missing');
                 }
                 
+                // Update pagination state
+                if (response.pagination) {
+                    currentPagination = {
+                        currentPage: response.pagination.currentPage,
+                        totalPages: response.pagination.totalPages,
+                        totalFiles: response.pagination.totalFiles,
+                        hasMore: response.pagination.hasMore,
+                        pageSize: response.pagination.pageSize
+                    };
+                }
+                
                 // Show processing statistics based on mode
                 showProcessingStats(response, usernameMode);
                 
                 // Process data for visualization
-                const userStats = {};
+                const pageUserStats = {};
                 let totalFiles = 0;
                 let totalDuration = 0;
                 
@@ -784,17 +941,17 @@
                     const duration = fileInfo.duration || 0;
                     const fileDate = new Date(fileInfo.recordingDate || fileInfo.lastModified);
                     
-                    if (!userStats[username]) {
-                        userStats[username] = {
+                    if (!pageUserStats[username]) {
+                        pageUserStats[username] = {
                             totalDuration: 0,
                             fileCount: 0,
                             files: []
                         };
                     }
                     
-                    userStats[username].totalDuration += duration;
-                    userStats[username].fileCount += 1;
-                    userStats[username].files.push({
+                    pageUserStats[username].totalDuration += duration;
+                    pageUserStats[username].fileCount += 1;
+                    pageUserStats[username].files.push({
                         filename: fileInfo.filename,
                         duration: duration,
                         date: fileDate,
@@ -805,21 +962,52 @@
                     totalDuration += duration;
                 }
                 
-                console.log('Processed Data:', { userStats, totalFiles, totalDuration });
-                return { userStats, totalFiles, totalDuration };
+                // Accumulate stats if loading more pages
+                if (loadMore) {
+                    // Merge with existing stats
+                    for (const [username, stats] of Object.entries(pageUserStats)) {
+                        if (!allUserStats[username]) {
+                            allUserStats[username] = {
+                                totalDuration: 0,
+                                fileCount: 0,
+                                files: []
+                            };
+                        }
+                        allUserStats[username].totalDuration += stats.totalDuration;
+                        allUserStats[username].fileCount += stats.fileCount;
+                        allUserStats[username].files.push(...stats.files);
+                    }
+                } else {
+                    // Fresh load - replace stats
+                    allUserStats = { ...pageUserStats };
+                }
+                
+                console.log('Processed Data:', { pageUserStats, allUserStats, totalFiles, totalDuration });
+                
+                // Update pagination UI
+                updatePaginationUI();
+                
+                return { 
+                    userStats: pageUserStats, 
+                    allUserStats: allUserStats,
+                    totalFiles, 
+                    totalDuration,
+                    totalAvailable: response.totalAvailable || totalFiles,
+                    loadMore: loadMore
+                };
                 
             } catch (err) {
                 console.error('Error fetching data:', err);
                 error.textContent = `Error loading data: ${err.message}`;
                 error.classList.add('active');
-                return { userStats: {}, totalFiles: 0, totalDuration: 0 };
+                return { userStats: {}, allUserStats: {}, totalFiles: 0, totalDuration: 0, totalAvailable: 0 };
             } finally {
                 loading.classList.remove('active');
             }
         }
         
-        // Fetch single user data
-        async function fetchSingleUser(hospitalFolder, startDate, endDate) {
+        // Fetch single user data with pagination
+        async function fetchSingleUser(hospitalFolder, startDate, endDate, page) {
             const username = document.getElementById('usernameFilter').value.trim();
             
             if (!username) {
@@ -830,12 +1018,14 @@
                 hospital: hospitalFolder,
                 startDate: startDate.toISOString(),
                 endDate: endDate.toISOString(),
-                username: username
+                username: username,
+                page: page,
+                pageSize: currentPagination.pageSize
             });
         }
         
-        // Fetch multiple users data with progress tracking
-        async function fetchMultipleUsers(hospitalFolder, startDate, endDate) {
+        // Fetch multiple users data with progress tracking and pagination
+        async function fetchMultipleUsers(hospitalFolder, startDate, endDate, page) {
             const usernamesText = document.getElementById('usernamesList').value.trim();
             const processingMode = document.getElementById('processingMode').value;
             
@@ -862,16 +1052,20 @@
                 usernames: usernames,
                 processingMode: processingMode,
                 maxConcurrentUsers: 5,
-                includeProgressDetails: true
+                includeProgressDetails: true,
+                page: page,
+                pageSize: currentPagination.pageSize
             });
         }
         
-        // Fetch all users data (fallback to old method)
-        async function fetchAllUsers(hospitalFolder, startDate, endDate) {
+        // Fetch all users data with pagination
+        async function fetchAllUsers(hospitalFolder, startDate, endDate, page) {
             return await apiRequest('audio-list', {
                 hospital: hospitalFolder,
                 startDate: startDate.toISOString(),
-                endDate: endDate.toISOString()
+                endDate: endDate.toISOString(),
+                page: page,
+                pageSize: currentPagination.pageSize
                 // No username = all users with client-side filtering
             });
         }
@@ -914,6 +1108,9 @@
                 
                 if (stats.ultraFastPrefixFiltering) {
                     optimizationText = `🚀 MULTI-USER ULTRA-FAST: Processed ${stats.usersProcessed} users with S3 prefix filtering! Found ${stats.matchingFiles} files | ${stats.s3ApiCalls} S3 calls | ${stats.efficiency} efficiency | Mode: ${stats.processingMode}`;
+                    if (response.pagination) {
+                        optimizationText += ` | Page ${response.pagination.currentPage}/${response.pagination.totalPages}`;
+                    }
                     cssClass = 'processing-info ultra-optimized';
                 } else if (efficiency > 15) {
                     optimizationText = `⚡ MULTI-USER OPTIMIZED: Processed ${stats.usersProcessed} users | Found ${stats.matchingFiles} files | ${stats.efficiency} efficiency`;
@@ -958,6 +1155,10 @@
                     cssClass = 'processing-info';
                 }
                 
+                if (response.pagination) {
+                    optimizationText += ` | ${stats.pagination || `Page ${response.pagination.currentPage}/${response.pagination.totalPages}`}`;
+                }
+                
                 if (usernameMode === 'all') {
                     optimizationText += ` | 💡 TIP: Use specific usernames for ultra-fast S3 prefix filtering!`;
                 }
@@ -969,8 +1170,8 @@
         }
         
         // Update statistics display
-        function updateStats(userStats, totalFiles, totalDuration) {
-            const userCount = Object.keys(userStats).length;
+        function updateStats(userStats, totalFiles, totalDuration, totalAvailable, loadMore = false) {
+            const userCount = Object.keys(allUserStats).length;
             const totalHours = Math.floor(totalDuration / 3600);
             const totalMinutes = Math.floor((totalDuration % 3600) / 60);
             const avgDurationPerUser = userCount > 0 ? totalDuration / userCount : 0;
@@ -978,20 +1179,20 @@
             
             document.getElementById('totalUsers').textContent = userCount;
             document.getElementById('totalFiles').textContent = totalFiles;
+            document.getElementById('totalAvailable').textContent = totalAvailable;
             document.getElementById('totalDuration').textContent = totalHours > 0 ? `${totalHours}h ${totalMinutes}m` : `${totalMinutes}m`;
-            document.getElementById('avgDuration').textContent = `${avgMinutes}m`;
         }
         
-        // Create or update chart
+        // Create or update chart (using accumulated data for better overview)
         function updateChart(userStats) {
             const ctx = document.getElementById('durationChart').getContext('2d');
             
-            // Prepare data for chart
-            const users = Object.keys(userStats).sort((a, b) => 
-                userStats[b].totalDuration - userStats[a].totalDuration
+            // Use accumulated stats for chart
+            const users = Object.keys(allUserStats).sort((a, b) => 
+                allUserStats[b].totalDuration - allUserStats[a].totalDuration
             );
             
-            const durations = users.map(user => Math.round(userStats[user].totalDuration / 60)); // in minutes
+            const durations = users.map(user => Math.round(allUserStats[user].totalDuration / 60)); // in minutes
             
             // Generate colors
             const colors = users.map((_, index) => {
@@ -1030,7 +1231,7 @@
                                 label: function(context) {
                                     const username = context.label;
                                     const duration = context.raw;
-                                    const fileCount = userStats[username].fileCount;
+                                    const fileCount = allUserStats[username].fileCount;
                                     return [
                                         `Duration: ${duration} minutes`,
                                         `Files: ${fileCount}`,
@@ -1065,12 +1266,12 @@
             });
         }
         
-        // Create user cards
+        // Create user cards (showing accumulated data)
         function createUserCards(userStats) {
             const userList = document.getElementById('userList');
             userList.innerHTML = '';
             
-            const sortedUsers = Object.entries(userStats).sort((a, b) => 
+            const sortedUsers = Object.entries(allUserStats).sort((a, b) => 
                 b[1].totalDuration - a[1].totalDuration
             );
             
@@ -1099,7 +1300,7 @@
         }
         
         // Main refresh function
-        async function refreshData() {
+        async function refreshData(page = 1, loadMore = false) {
             if (!currentHospital) {
                 alert('Please select a hospital first');
                 return;
@@ -1122,25 +1323,25 @@
             const endDate = new Date(endDateStr);
             endDate.setHours(23, 59, 59, 999);
             
-            console.log('Starting optimized refresh with:', { currentHospital, startDate, endDate });
+            console.log('Starting optimized refresh with:', { currentHospital, startDate, endDate, page, loadMore });
             
             try {
-                const result = await fetchAudioData(startDate, endDate, currentHospital);
+                const result = await fetchAudioData(startDate, endDate, currentHospital, page, loadMore);
                 if (!result) {
                     throw new Error('fetchAudioData returned undefined');
                 }
                 
-                const { userStats, totalFiles, totalDuration } = result;
-                console.log('Updating UI with:', { userStats, totalFiles, totalDuration });
+                const { userStats, allUserStats, totalFiles, totalDuration, totalAvailable } = result;
+                console.log('Updating UI with:', { userStats, allUserStats, totalFiles, totalDuration, totalAvailable });
                 
-                if (Object.keys(userStats).length === 0) {
+                if (Object.keys(allUserStats).length === 0) {
                     document.getElementById('error').textContent = 'No audio files found for the selected hospital and date range';
                     document.getElementById('error').classList.add('active');
                 } else {
                     document.getElementById('error').classList.remove('active');
                 }
                 
-                updateStats(userStats, totalFiles, totalDuration);
+                updateStats(userStats, totalFiles, totalDuration, totalAvailable, loadMore);
                 updateChart(userStats);
                 createUserCards(userStats);
                 
@@ -1151,8 +1352,48 @@
             }
         }
         
+        // Pagination navigation functions
+        async function goToFirstPage() {
+            resetPagination();
+            await refreshData(1, false);
+        }
+        
+        async function goToPreviousPage() {
+            if (currentPagination.currentPage > 1) {
+                await refreshData(currentPagination.currentPage - 1, false);
+            }
+        }
+        
+        async function goToNextPage() {
+            if (currentPagination.hasMore) {
+                await refreshData(currentPagination.currentPage + 1, false);
+            }
+        }
+        
+        async function goToLastPage() {
+            if (currentPagination.hasMore) {
+                await refreshData(currentPagination.totalPages, false);
+            }
+        }
+        
+        async function loadMoreData() {
+            if (currentPagination.hasMore) {
+                await refreshData(currentPagination.currentPage + 1, true);
+            }
+        }
+        
         // Event listeners
-        document.getElementById('refreshData').addEventListener('click', refreshData);
+        document.getElementById('refreshData').addEventListener('click', () => {
+            resetPagination();
+            refreshData(1, false);
+        });
+        
+        // Pagination event listeners
+        document.getElementById('firstPageBtn').addEventListener('click', goToFirstPage);
+        document.getElementById('prevPageBtn').addEventListener('click', goToPreviousPage);
+        document.getElementById('nextPageBtn').addEventListener('click', goToNextPage);
+        document.getElementById('lastPageBtn').addEventListener('click', goToLastPage);
+        document.getElementById('loadMoreBtn').addEventListener('click', loadMoreData);
         
         document.getElementById('hospitalSelect').addEventListener('change', function() {
             currentHospital = this.value;
@@ -1161,6 +1402,7 @@
             // Clear previous data when switching hospitals
             if (currentHospital) {
                 clearDisplayData();
+                resetPagination();
             }
         });
         
@@ -1168,11 +1410,14 @@
         function clearDisplayData() {
             document.getElementById('totalUsers').textContent = '0';
             document.getElementById('totalFiles').textContent = '0';
+            document.getElementById('totalAvailable').textContent = '0';
             document.getElementById('totalDuration').textContent = '0h';
-            document.getElementById('avgDuration').textContent = '0m';
             document.getElementById('userList').innerHTML = '';
             document.getElementById('processingInfo').style.display = 'none';
             document.getElementById('userProgress').classList.remove('active');
+            document.getElementById('paginationPanel').classList.remove('active');
+            
+            allUserStats = {};
             
             if (chartInstance) {
                 chartInstance.destroy();
@@ -1221,6 +1466,7 @@
         initializeHospitals();
         initializeDates();
         updateHospitalInfo();
+        resetPagination();
         
         // Initialize username mode (trigger change event to set up initial state)
         document.getElementById('usernameMode').dispatchEvent(new Event('change'));
