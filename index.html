@@ -11,38 +11,32 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: #333;
         }
-
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
-
         .header {
             text-align: center;
             margin-bottom: 40px;
             color: white;
         }
-
         .header h1 {
             font-size: 3rem;
             font-weight: 300;
             margin-bottom: 10px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
-
         .header p {
             font-size: 1.2rem;
             opacity: 0.9;
         }
-
         .controls-panel {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -52,7 +46,6 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             border: 1px solid rgba(255,255,255,0.2);
         }
-
         .hospital-controls {
             display: flex;
             gap: 20px;
@@ -63,23 +56,19 @@
             padding-bottom: 25px;
             border-bottom: 1px solid #e0e0e0;
         }
-
         .hospital-selector {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
-
         .hospital-selector label {
             font-weight: 600;
             color: #555;
             font-size: 0.9rem;
         }
-
         .select-wrapper {
             position: relative;
         }
-
         .hospital-dropdown {
             padding: 12px 40px 12px 16px;
             border: 2px solid #e0e0e0;
@@ -91,13 +80,11 @@
             appearance: none;
             min-width: 200px;
         }
-
         .hospital-dropdown:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
-
         .select-wrapper::after {
             content: '▼';
             position: absolute;
@@ -108,7 +95,6 @@
             pointer-events: none;
             font-size: 0.8rem;
         }
-
         .add-hospital-btn {
             padding: 12px 20px;
             background: linear-gradient(135deg, #43a047, #66bb6a);
@@ -121,12 +107,10 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(67, 160, 71, 0.3);
         }
-
         .add-hospital-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(67, 160, 71, 0.4);
         }
-
         .date-controls {
             display: flex;
             gap: 20px;
@@ -134,19 +118,16 @@
             flex-wrap: wrap;
             justify-content: center;
         }
-
         .date-group {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
-
         .date-group label {
             font-weight: 600;
             color: #555;
             font-size: 0.9rem;
         }
-
         .date-input {
             padding: 12px 16px;
             border: 2px solid #e0e0e0;
@@ -155,13 +136,11 @@
             transition: all 0.3s ease;
             background: white;
         }
-
         .date-input:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
-
         .refresh-btn {
             padding: 12px 24px;
             background: linear-gradient(135deg, #667eea, #764ba2);
@@ -174,23 +153,19 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
-
         .refresh-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
-
         .refresh-btn:active {
             transform: translateY(0);
         }
-
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
-
         .stat-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -201,24 +176,20 @@
             border: 1px solid rgba(255,255,255,0.2);
             transition: transform 0.3s ease;
         }
-
         .stat-card:hover {
             transform: translateY(-5px);
         }
-
         .stat-number {
             font-size: 2.5rem;
             font-weight: 700;
             color: #667eea;
             margin-bottom: 10px;
         }
-
         .stat-label {
             font-size: 1rem;
             color: #666;
             font-weight: 500;
         }
-
         .chart-container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -228,7 +199,6 @@
             border: 1px solid rgba(255,255,255,0.2);
             margin-bottom: 30px;
         }
-
         .chart-title {
             font-size: 1.5rem;
             font-weight: 600;
@@ -236,12 +206,10 @@
             margin-bottom: 20px;
             text-align: center;
         }
-
         .chart-wrapper {
             position: relative;
             height: 400px;
         }
-
         .loading {
             display: none;
             text-align: center;
@@ -249,11 +217,9 @@
             color: #667eea;
             font-size: 1.1rem;
         }
-
         .loading.active {
             display: block;
         }
-
         .error {
             background: #fee;
             color: #c33;
@@ -263,11 +229,9 @@
             border-left: 4px solid #c33;
             display: none;
         }
-
         .error.active {
             display: block;
         }
-
         .modal {
             display: none;
             position: fixed;
@@ -279,13 +243,11 @@
             background-color: rgba(0,0,0,0.5);
             backdrop-filter: blur(5px);
         }
-
         .modal.active {
             display: flex;
             align-items: center;
             justify-content: center;
         }
-
         .modal-content {
             background: white;
             padding: 30px;
@@ -295,14 +257,12 @@
             width: 90%;
             text-align: center;
         }
-
         .modal-title {
             font-size: 1.5rem;
             font-weight: 600;
             color: #333;
             margin-bottom: 20px;
         }
-
         .modal-input {
             width: 100%;
             padding: 12px 16px;
@@ -312,19 +272,16 @@
             margin-bottom: 20px;
             box-sizing: border-box;
         }
-
         .modal-input:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
-
         .modal-buttons {
             display: flex;
             gap: 15px;
             justify-content: center;
         }
-
         .modal-btn {
             padding: 10px 20px;
             border: none;
@@ -334,21 +291,17 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
         .modal-btn.primary {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
         }
-
         .modal-btn.secondary {
             background: #f5f5f5;
             color: #333;
         }
-
         .modal-btn:hover {
             transform: translateY(-2px);
         }
-
         .no-hospital-message {
             text-align: center;
             padding: 40px;
@@ -360,7 +313,6 @@
             margin: 20px 0;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
-
         .hospital-info {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
@@ -371,14 +323,22 @@
             font-weight: 600;
             font-size: 1.1rem;
         }
-
+        .filter-info {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+            border: 1px solid #e0e0e0;
+        }
         .user-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
             margin-top: 30px;
         }
-
         .user-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -388,35 +348,29 @@
             border: 1px solid rgba(255,255,255,0.2);
             transition: transform 0.3s ease;
         }
-
         .user-card:hover {
             transform: translateY(-3px);
         }
-
         .user-name {
             font-size: 1.2rem;
             font-weight: 600;
             color: #333;
             margin-bottom: 10px;
         }
-
         .user-stats {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
         .duration {
             font-size: 1.5rem;
             font-weight: 700;
             color: #667eea;
         }
-
         .file-count {
             font-size: 0.9rem;
             color: #666;
         }
-
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
@@ -444,7 +398,6 @@
             <h1>Audio Monitoring Dashboard</h1>
             <p>Track user audio uploads and analyze duration patterns</p>
         </div>
-
         <div class="controls-panel">
             <div class="hospital-controls">
                 <div class="hospital-selector">
@@ -455,8 +408,6 @@
                             <option value="Erebuni">Erebuni Hospital</option>
                             <option value="Onco">Onco Hospital</option>
                             <option value="Astghik">Astghik Hospital</option>
-                            <!-- <option value="trauma-center">Trauma Center</option>
-                            <option value="rehabilitation-center">Rehabilitation Center</option> -->
                         </select>
                     </div>
                 </div>
@@ -475,7 +426,7 @@
                 <button id="refreshData" class="refresh-btn">📊 Refresh Data</button>
             </div>
         </div>
-
+        
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number" id="totalUsers">0</div>
@@ -494,30 +445,27 @@
                 <div class="stat-label">Avg per User</div>
             </div>
         </div>
-
+        
         <div class="loading" id="loading">
             <div>📡 Loading audio data...</div>
         </div>
-
         <div class="error" id="error"></div>
-
         <div id="hospitalInfo" class="hospital-info" style="display: none;"></div>
-
+        <div id="filterInfo" class="filter-info" style="display: none;"></div>
         <div id="noHospitalMessage" class="no-hospital-message">
             <h3>🏥 Select a Hospital</h3>
             <p>Please select a hospital from the dropdown above to view audio monitoring data.</p>
         </div>
-
+        
         <div class="chart-container">
             <div class="chart-title">User Audio Duration Analysis</div>
             <div class="chart-wrapper">
                 <canvas id="durationChart"></canvas>
             </div>
         </div>
-
         <div class="user-list" id="userList"></div>
     </div>
-
+    
     <!-- Add Hospital Modal -->
     <div id="addHospitalModal" class="modal">
         <div class="modal-content">
@@ -529,50 +477,46 @@
             </div>
         </div>
     </div>
-
+    
     <script>
-        // Configuration - Using AWS Lambda Function URL
+        // Configuration - Update with your Lambda Function URL
         const API_CONFIG = {
-            baseUrl: 'https://blike2u2ckpj53v6wyklakq7ca0izxmp.lambda-url.us-east-1.on.aws', // No trailing slash!
-            // No AWS credentials needed in frontend!
+            baseUrl: 'https://blike2u2ckpj53v6wyklakq7ca0izxmp.lambda-url.us-east-1.on.aws'
         };
-
-        // Remove AWS SDK - we'll use presigned URLs from backend instead
+        
         let chartInstance = null;
         let currentHospital = '';
-
+        
         // Hospital management
         const hospitals = [
             { value: 'Erebuni', name: 'Erebuni Hospital' },
             { value: 'Onco', name: 'Onco Hospital' },
             { value: 'Astghik', name: 'Astghik Hospital' },
-            // { value: 'trauma-center', name: 'Trauma Center' },
-            // { value: 'rehabilitation-center', name: 'Rehabilitation Center' }
         ];
-
-        // API helper functions
-        async function apiRequest(endpoint, options = {}) {
-            const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
-            const url = API_CONFIG.baseUrl + (cleanEndpoint ? '/' + cleanEndpoint : '');
-            console.log('Making request to:', url);
+        
+        // Simplified API helper function
+        async function apiRequest(action, options = {}) {
+            console.log('Making request:', { action, options });
+            
             const body = {
-                action: cleanEndpoint,
-                ...options.body // Pass body as object
+                action: action,
+                ...options
             };
-            console.log('Request body:', body);
-            const response = await fetch(url, {
+            
+            const response = await fetch(API_CONFIG.baseUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body) // Stringify once
+                body: JSON.stringify(body)
             });
+            
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
             }
+            
             return response.json();
         }
-
-
+        
         // Initialize hospitals dropdown
         function initializeHospitals() {
             const select = document.getElementById('hospitalSelect');
@@ -585,7 +529,7 @@
                 select.appendChild(option);
             });
         }
-
+        
         // Add new hospital
         function addHospital(name) {
             const folderName = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
@@ -599,7 +543,7 @@
             currentHospital = folderName;
             updateHospitalInfo();
         }
-
+        
         // Update hospital info display
         function updateHospitalInfo() {
             const hospitalInfo = document.getElementById('hospitalInfo');
@@ -615,7 +559,7 @@
                 noHospitalMessage.style.display = 'block';
             }
         }
-
+        
         // Initialize date inputs with default values
         function initializeDates() {
             const today = new Date();
@@ -624,117 +568,70 @@
             document.getElementById('endDate').value = today.toISOString().split('T')[0];
             document.getElementById('startDate').value = oneWeekAgo.toISOString().split('T')[0];
         }
-
-        // Parse filename to extract user and date info
-        function parseFilename(filename) {
-            const match = filename.match(/^([^_]+)_(\d{6})_\d+\.wav$/i);
-            if (!match) {
-                console.warn('Invalid filename format:', filename);
-                return null;
-            }
-            const [, username, dateStr] = match;
-            console.log('Parsing dateStr:', { filename, dateStr }); // Debug
-            const month = parseInt(dateStr.substring(0, 2));
-            const day = parseInt(dateStr.substring(2, 4));
-            const hour = parseInt(dateStr.substring(4, 6));
-            const year = 2025; // Hardcode for 2025
-            const date = new Date(year, month - 1, day, hour);
-            if (isNaN(date.getTime())) {
-                console.warn('Invalid date parsed from filename:', filename, { month, day, hour, year });
-                return null;
-            }
-            console.log('Parsed date:', { filename, date: date.toISOString() }); // Debug
-            return { username, date };
-        }
-
-        // Get audio duration from presigned URL metadata
-        async function getAudioDuration(fileInfo) {
-            try {
-                // Try to get duration from backend-provided metadata first
-                if (fileInfo.duration) {
-                    return parseFloat(fileInfo.duration);
-                }
-                
-                // If no duration metadata, request it from backend
-                const response = await apiRequest('audio-duration', {
-                    body: JSON.stringify({
-                        hospital: currentHospital,
-                        filename: fileInfo.filename
-                    })
-                });
-                
-                return response.duration || 0;
-            } catch (error) {
-                console.error('Error getting audio duration:', error);
-                
-                // Fallback: estimate from file size if provided
-                if (fileInfo.size) {
-                    const sizeInMB = fileInfo.size / (1024 * 1024);
-                    const estimatedDuration = (sizeInMB / 1.4) * 60; // seconds
-                    return estimatedDuration;
-                }
-                
-                return 0;
-            }
-        }
-
-        // Fetch and process audio data using backend API
+        
+        // Simplified audio data fetching - Lambda now handles all filtering
         async function fetchAudioData(startDate, endDate, hospitalFolder) {
             const loading = document.getElementById('loading');
             const error = document.getElementById('error');
-            
-            if (!loading || !error) {
-                console.error('DOM elements missing:', { loading, error });
-                throw new Error('Required DOM elements (loading or error) not found');
-            }
+            const filterInfo = document.getElementById('filterInfo');
             
             loading.classList.add('active');
             error.classList.remove('active');
-
+            filterInfo.style.display = 'none';
+            
             try {
                 console.log('Fetching data for:', { hospitalFolder, startDate, endDate });
+                
                 let allFiles = [];
                 let offset = 0;
                 const limit = 200;
                 let hasMore = true;
-
+                
                 while (hasMore) {
                     const response = await apiRequest('audio-list', {
-                        body: {
-                            hospital: hospitalFolder,
-                            startDate: startDate.toISOString(),
-                            endDate: endDate.toISOString(),
-                            limit: limit,
-                            offset: offset
-                        }
+                        hospital: hospitalFolder,
+                        startDate: startDate.toISOString(),
+                        endDate: endDate.toISOString(),
+                        limit: limit,
+                        offset: offset,
+                        filterByFilename: true // Use filename-based filtering for accuracy
                     });
-                    console.log('API Response:', { offset, response });
+                    
+                    console.log('API Response:', response);
+                    
                     if (!response || !Array.isArray(response.files)) {
                         throw new Error('Invalid API response: files array missing');
                     }
+                    
                     allFiles = allFiles.concat(response.files);
-                    console.log('Fetched audio files:', allFiles.length, 'Total available:', response.totalAvailable);
                     hasMore = response.hasMore || false;
                     offset += response.limit || limit;
+                    
+                    // Show filter info on first response
+                    if (offset === (response.limit || limit) && response.filterMethod) {
+                        filterInfo.textContent = `Filtering by: ${response.filterMethod === 'filename' ? 'Recording Date (from filename)' : 'Upload Date (S3 timestamp)'} | Found ${response.totalAvailable} files`;
+                        filterInfo.style.display = 'block';
+                    }
                 }
-
-                console.log('All Audio Files:', allFiles.length);
-
+                
+                console.log('Total files fetched:', allFiles.length);
+                
+                // Process data - much simpler now since Lambda provides username and duration
                 const userStats = {};
                 let totalFiles = 0;
                 let totalDuration = 0;
-
+                
                 for (const fileInfo of allFiles) {
-                    const parsedInfo = parseFilename(fileInfo.filename);
-                    console.log('Parsed File:', { filename: fileInfo.filename, parsedInfo });
-                    if (!parsedInfo) continue;
-
-                    const { username } = parsedInfo;
-                    const fileDate = new Date(fileInfo.lastModified);
-                    console.log('File Date from lastModified:', { filename: fileInfo.filename, lastModified: fileDate.toISOString() });
-
-                    const duration = await getAudioDuration(fileInfo);
-                    console.log('File Duration:', { filename: fileInfo.filename, duration });
+                    // Use username from Lambda response or extract from filename as fallback
+                    let username = fileInfo.username;
+                    if (!username) {
+                        // Fallback: extract from filename
+                        const match = fileInfo.filename.match(/^([^_]+)_/);
+                        username = match ? match[1] : 'Unknown';
+                    }
+                    
+                    const duration = fileInfo.duration || 0;
+                    const fileDate = new Date(fileInfo.recordingDate || fileInfo.lastModified);
                     
                     if (!userStats[username]) {
                         userStats[username] = {
@@ -752,13 +649,14 @@
                         date: fileDate,
                         presignedUrl: fileInfo.presignedUrl
                     });
-
+                    
                     totalFiles++;
                     totalDuration += duration;
                 }
-
+                
                 console.log('Processed Data:', { userStats, totalFiles, totalDuration });
                 return { userStats, totalFiles, totalDuration };
+                
             } catch (err) {
                 console.error('Error fetching data:', err);
                 error.textContent = `Error loading data: ${err.message}`;
@@ -768,8 +666,21 @@
                 loading.classList.remove('active');
             }
         }
-
-
+        
+        // Update statistics display
+        function updateStats(userStats, totalFiles, totalDuration) {
+            const userCount = Object.keys(userStats).length;
+            const totalHours = Math.floor(totalDuration / 3600);
+            const totalMinutes = Math.floor((totalDuration % 3600) / 60);
+            const avgDurationPerUser = userCount > 0 ? totalDuration / userCount : 0;
+            const avgMinutes = Math.round(avgDurationPerUser / 60);
+            
+            document.getElementById('totalUsers').textContent = userCount;
+            document.getElementById('totalFiles').textContent = totalFiles;
+            document.getElementById('totalDuration').textContent = totalHours > 0 ? `${totalHours}h ${totalMinutes}m` : `${totalMinutes}m`;
+            document.getElementById('avgDuration').textContent = `${avgMinutes}m`;
+        }
+        
         // Create or update chart
         function updateChart(userStats) {
             const ctx = document.getElementById('durationChart').getContext('2d');
@@ -786,12 +697,12 @@
                 const hue = (index * 137.5) % 360;
                 return `hsla(${hue}, 70%, 60%, 0.8)`;
             });
-
+            
             // Destroy existing chart
             if (chartInstance) {
                 chartInstance.destroy();
             }
-
+            
             chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -852,16 +763,16 @@
                 }
             });
         }
-
+        
         // Create user cards
         function createUserCards(userStats) {
             const userList = document.getElementById('userList');
             userList.innerHTML = '';
-
+            
             const sortedUsers = Object.entries(userStats).sort((a, b) => 
                 b[1].totalDuration - a[1].totalDuration
             );
-
+            
             sortedUsers.forEach(([username, stats]) => {
                 const card = document.createElement('div');
                 card.className = 'user-card';
@@ -873,7 +784,7 @@
                 const displayDuration = durationHours > 0 
                     ? `${durationHours}h ${remainingMinutes}m`
                     : `${durationMinutes}m`;
-
+                
                 card.innerHTML = `
                     <div class="user-name">${username}</div>
                     <div class="user-stats">
@@ -885,13 +796,14 @@
                 userList.appendChild(card);
             });
         }
-
+        
         // Main refresh function
         async function refreshData() {
             if (!currentHospital) {
                 alert('Please select a hospital first');
                 return;
             }
+            
             const startDateStr = document.getElementById('startDate').value;
             const endDateStr = document.getElementById('endDate').value;
             
@@ -899,38 +811,45 @@
                 alert('Please select both start and end dates');
                 return;
             }
+            
             if (new Date(startDateStr) > new Date(endDateStr)) {
                 alert('Start date must be before end date');
                 return;
             }
-
+            
             const startDate = new Date(startDateStr);
             const endDate = new Date(endDateStr);
             endDate.setHours(23, 59, 59, 999);
-
+            
             console.log('Starting refresh with:', { currentHospital, startDate, endDate });
+            
             try {
                 const result = await fetchAudioData(startDate, endDate, currentHospital);
                 if (!result) {
                     throw new Error('fetchAudioData returned undefined');
                 }
+                
                 const { userStats, totalFiles, totalDuration } = result;
                 console.log('Updating UI with:', { userStats, totalFiles, totalDuration });
+                
                 if (Object.keys(userStats).length === 0) {
                     document.getElementById('error').textContent = 'No audio files found for the selected hospital and date range';
                     document.getElementById('error').classList.add('active');
                 } else {
                     document.getElementById('error').classList.remove('active');
                 }
+                
                 updateStats(userStats, totalFiles, totalDuration);
                 updateChart(userStats);
                 createUserCards(userStats);
+                
             } catch (err) {
                 console.error('Refresh error:', err);
                 document.getElementById('error').textContent = `Failed to refresh data: ${err.message}`;
                 document.getElementById('error').classList.add('active');
             }
         }
+        
         // Event listeners
         document.getElementById('refreshData').addEventListener('click', refreshData);
         
@@ -945,6 +864,7 @@
                 document.getElementById('totalDuration').textContent = '0h';
                 document.getElementById('avgDuration').textContent = '0m';
                 document.getElementById('userList').innerHTML = '';
+                document.getElementById('filterInfo').style.display = 'none';
                 
                 if (chartInstance) {
                     chartInstance.destroy();
@@ -952,18 +872,18 @@
                 }
             }
         });
-
+        
         // Add Hospital Modal functionality
         document.getElementById('addHospitalBtn').addEventListener('click', function() {
             document.getElementById('addHospitalModal').classList.add('active');
             document.getElementById('hospitalNameInput').focus();
         });
-
+        
         document.getElementById('cancelAddHospital').addEventListener('click', function() {
             document.getElementById('addHospitalModal').classList.remove('active');
             document.getElementById('hospitalNameInput').value = '';
         });
-
+        
         document.getElementById('confirmAddHospital').addEventListener('click', function() {
             const hospitalName = document.getElementById('hospitalNameInput').value.trim();
             if (hospitalName) {
@@ -974,7 +894,7 @@
                 alert('Please enter a hospital name');
             }
         });
-
+        
         // Close modal when clicking outside
         document.getElementById('addHospitalModal').addEventListener('click', function(e) {
             if (e.target === this) {
@@ -982,85 +902,18 @@
                 document.getElementById('hospitalNameInput').value = '';
             }
         });
-
+        
         // Enter key support for modal
         document.getElementById('hospitalNameInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 document.getElementById('confirmAddHospital').click();
             }
         });
-
+        
         // Initialize
         initializeHospitals();
         initializeDates();
         updateHospitalInfo();
-        
-        // Show demo data message
-        setTimeout(() => {
-            const error = document.getElementById('error');
-            error.innerHTML = `
-                <strong>AWS Lambda Function Required:</strong> This dashboard uses a single Lambda function with Function URL.
-                <br><br>
-                <strong>Lambda Function Actions:</strong>
-                <ul style="margin-top: 10px; text-align: left;">
-                    <li><strong>audio-list</strong> - List audio files for a hospital and date range</li>
-                    <li><strong>audio-duration</strong> - Get audio file duration</li>
-                </ul>
-                <br>
-                <strong>Expected Request/Response Format:</strong>
-                <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.9rem;">
-// Request for audio-list
-{
-  "action": "audio-list",
-  "hospital": "Erebuni",
-  "startDate": "2025-04-20T00:00:00Z",
-  "endDate": "2025-04-27T23:59:59Z"
-}
-
-// Response
-{
-  "files": [
-    {
-      "filename": "Anush76cardio_042517_3103426.wav",
-      "size": 114688,
-      "duration": 45.2,
-      "lastModified": "2025-04-25T17:51:45Z",
-      "presignedUrl": "https://s3.amazonaws.com/..."
-    }
-  ]
-}
-
-// Request for audio-duration
-{
-  "action": "audio-duration",
-  "hospital": "Erebuni",
-  "filename": "Anush76cardio_042517_3103426.wav"
-}
-
-// Response
-{
-  "duration": 45.2
-}
-                </pre>
-                <br>
-                <strong>Setup Steps:</strong>
-                <ol style="margin-top: 10px; text-align: left;">
-                    <li>🚀 Deploy the Lambda function with S3 permissions</li>
-                    <li>🔗 Create a Function URL (public access)</li>
-                    <li>📝 Update API_CONFIG.baseUrl with your Function URL</li>
-                    <li>📁 Ensure S3 bucket has hospital folders with WAV files</li>
-                </ol>
-                <br>
-                <strong>Benefits:</strong>
-                <ul style="margin-top: 10px; text-align: left;">
-                    <li>💰 Pay only when used (no always-on server costs)</li>
-                    <li>🔒 Secure - no AWS credentials in frontend</li>
-                    <li>⚡ Auto-scaling with zero maintenance</li>
-                    <li>🌐 Public URL - no API Gateway needed</li>
-                </ul>
-            `;
-            error.classList.add('active');
-        }, 1000);
     </script>
 </body>
 </html>
