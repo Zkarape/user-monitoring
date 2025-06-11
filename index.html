@@ -695,7 +695,7 @@
                 console.log('Fetching data for:', { hospitalFolder, startDate, endDate });
                 let allFiles = [];
                 let offset = 0;
-                const limit = 200; // Increased for efficiency
+                const limit = 200;
                 let hasMore = true;
 
                 while (hasMore) {
@@ -733,32 +733,28 @@
                     const fileDate = new Date(fileInfo.lastModified);
                     console.log('File Date from lastModified:', { filename: fileInfo.filename, lastModified: fileDate.toISOString() });
 
-                    if (fileDate >= startDate && fileDate <= endDate) {
-                        const duration = await getAudioDuration(fileInfo);
-                        console.log('File Duration:', { filename: fileInfo.filename, duration });
-                        
-                        if (!userStats[username]) {
-                            userStats[username] = {
-                                totalDuration: 0,
-                                fileCount: 0,
-                                files: []
-                            };
-                        }
-                        
-                        userStats[username].totalDuration += duration;
-                        userStats[username].fileCount += 1;
-                        userStats[username].files.push({
-                            filename: fileInfo.filename,
-                            duration: duration,
-                            date: fileDate,
-                            presignedUrl: fileInfo.presignedUrl
-                        });
-
-                        totalFiles++;
-                        totalDuration += duration;
-                    } else {
-                        console.log('Skipped file:', { filename: fileInfo.filename, lastModified: fileDate.toISOString(), reason: 'Outside date range' });
+                    const duration = await getAudioDuration(fileInfo);
+                    console.log('File Duration:', { filename: fileInfo.filename, duration });
+                    
+                    if (!userStats[username]) {
+                        userStats[username] = {
+                            totalDuration: 0,
+                            fileCount: 0,
+                            files: []
+                        };
                     }
+                    
+                    userStats[username].totalDuration += duration;
+                    userStats[username].fileCount += 1;
+                    userStats[username].files.push({
+                        filename: fileInfo.filename,
+                        duration: duration,
+                        date: fileDate,
+                        presignedUrl: fileInfo.presignedUrl
+                    });
+
+                    totalFiles++;
+                    totalDuration += duration;
                 }
 
                 console.log('Processed Data:', { userStats, totalFiles, totalDuration });
@@ -772,6 +768,7 @@
                 loading.classList.remove('active');
             }
         }
+
 
         // Create or update chart
         function updateChart(userStats) {
