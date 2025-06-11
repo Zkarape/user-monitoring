@@ -680,44 +680,57 @@
 
         // Fetch and process audio data using backend API
         async function fetchAudioData(startDate, endDate, hospitalFolder) {
-            const loading = document.getElementById('loading');
-            const error = document.getElementById('error');
+            const loading = document.getElementById('loadingId');
+            const error = document.getElementById('errorId');
             
             loading.classList.add('active');
             error.classList.remove('active');
 
             try {
                 console.log('Fetching data for:', { hospitalFolder, startDate, endDate });
-                const response = await apiRequest('audio-list', {
-                    body: {
-                        hospital: hospitalFolder,
-                        startDate: startDate.toISOString(),
-                        endDate: endDate.toISOString(),
-                        limit: 100,
-                        offset: 0
+                let allFiles = [];
+                let offset = 0;
+                const limit = 200; // Increased for efficiency
+                let hasMore = true;
+
+                while (hasMore) {
+                    const response = await apiRequest('audio-list', {
+                        body: {
+                            hospital: hospitalFolder,
+                            startDate: startDate.toISOString(),
+                            endDate: endDate.toISOString(),
+                            limit: limit,
+                            offset: offset
+                        }
+                    });
+                    console.log('API Response:', { offset, response });
+                    if (!response || !Array.isArray(response.files)) {
+                        throw new Error('Invalid API response: files array missing');
                     }
-                });
-                console.log('API Response:', response);
-                if (!response || !Array.isArray(response.files)) {
-                    throw new Error('Invalid API response: files array missing');
+                    allFiles = allFiles.concat(response.files);
+                    console.log('Fetched audio files:', allFiles.length, ' Total available:', response.totalAvailable);
+                    hasMore = response.hasMore || false;
+                    offset += response.limit || limit;
                 }
-                const audioFiles = response.files;
-                console.log('Audio Files:', audioFiles);
+
+                console.log('All Audio Files:', allFiles);
 
                 const userStats = {};
                 let totalFiles = 0;
                 let totalDuration = 0;
 
-                for (const fileInfo of audioFiles) {
+                for (const fileInfo of allFiles) {
                     const parsedInfo = parseFilename(fileInfo.filename);
-                    console.log('Parsed File:', fileInfo.filename, parsedInfo);
+                    console.log('Parsed File:', { filename: fileInfo.filename, parsedInfo });
                     if (!parsedInfo) continue;
 
-                    const { username, date } = parsedInfo;
-                    
-                    if (date >= startDate && date <= endDate) {
+                    const { username } = parsedInfo;
+                    const fileDate = new Date(fileInfo.lastModified);
+                    console.log('File Date from lastModified:', { filename: fileInfo.filename, lastModified: fileDate.toISOString() });
+
+                    if (fileDate >= startDate && fileDate <= endDate) {
                         const duration = await getAudioDuration(fileInfo);
-                        console.log('File Duration:', fileInfo.filename, duration);
+                        console.log('File Duration:', { filename: fileInfo.filename, duration });
                         
                         if (!userStats[username]) {
                             userStats[username] = {
@@ -732,12 +745,14 @@
                         userStats[username].files.push({
                             filename: fileInfo.filename,
                             duration: duration,
-                            date: date,
+                            date: fileDate,
                             presignedUrl: fileInfo.presignedUrl
                         });
-                        
+
                         totalFiles++;
                         totalDuration += duration;
+                    } else {
+                        console.log('Skipped file:', { filename: fileInfo.filename, lastModified: fileDate.toISOString(), reason: 'Outside date range' });
                     }
                 }
 
@@ -753,16 +768,6 @@
             }
         }
 
-        // Update statistics display
-        function updateStats(userStats, totalFiles, totalDuration) {
-            const totalUsers = Object.keys(userStats).length;
-            const avgDuration = totalUsers > 0 ? totalDuration / totalUsers : 0;
-
-            document.getElementById('totalUsers').textContent = totalUsers;
-            document.getElementById('totalFiles').textContent = totalFiles.toLocaleString();
-            document.getElementById('totalDuration').textContent = `${Math.round(totalDuration / 3600)}h`;
-            document.getElementById('avgDuration').textContent = `${Math.round(avgDuration / 60)}m`;
-        }
 
         // Create or update chart
         function updateChart(userStats) {
