@@ -627,7 +627,7 @@
 
         // Parse filename to extract user and date info
         function parseFilename(filename) {
-            const match = filename.match(/^([^_]+)_(\d{5})_\d+\.wav$/i);
+            const match = filename.match(/^([^_]+)_(\d{6})_\d+\.wav$/i);
             if (!match) {
                 console.warn('Invalid filename format:', filename);
                 return null;
@@ -636,7 +636,7 @@
             console.log('Parsing dateStr:', { filename, dateStr }); // Debug
             const month = parseInt(dateStr.substring(0, 2));
             const day = parseInt(dateStr.substring(2, 4));
-            const hour = parseInt(dateStr.substring(4, 5));
+            const hour = parseInt(dateStr.substring(4, 6));
             const year = 2025; // Hardcode for 2025
             const date = new Date(year, month - 1, day, hour);
             if (isNaN(date.getTime())) {
@@ -646,7 +646,7 @@
             console.log('Parsed date:', { filename, date: date.toISOString() }); // Debug
             return { username, date };
         }
-        
+
         // Get audio duration from presigned URL metadata
         async function getAudioDuration(fileInfo) {
             try {
