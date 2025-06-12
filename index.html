@@ -158,68 +158,6 @@
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
-        .user-progress {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            display: none;
-        }
-        .user-progress.active {
-            display: block;
-        }
-        .progress-header {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .progress-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .progress-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #e0e0e0;
-            transition: all 0.3s ease;
-        }
-        .progress-item.processing {
-            border-left-color: #667eea;
-            background: rgba(102, 126, 234, 0.1);
-            animation: pulse-border 1.5s infinite;
-        }
-        .progress-item.completed {
-            border-left-color: #43a047;
-            background: rgba(67, 160, 71, 0.1);
-        }
-        .progress-item.ultra-fast {
-            border-left-color: #ff6b35;
-            background: rgba(255, 107, 53, 0.1);
-        }
-        @keyframes pulse-border {
-            0% { border-left-width: 4px; }
-            50% { border-left-width: 8px; }
-            100% { border-left-width: 4px; }
-        }
-        .progress-username {
-            font-weight: 600;
-            color: #333;
-        }
-        .progress-details {
-            font-size: 0.85rem;
-            color: #666;
-        }
         .refresh-btn {
             padding: 12px 24px;
             background: linear-gradient(135deg, #667eea, #764ba2);
@@ -239,6 +177,90 @@
         .refresh-btn:active {
             transform: translateY(0);
         }
+        .refresh-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Auto-batching progress styles */
+        .batch-progress {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: none;
+        }
+        .batch-progress.active {
+            display: block;
+        }
+        .batch-header {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .batch-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        .batch-bar-container {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 20px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        .batch-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #43a047, #66bb6a);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+        .batch-bar.pulsing {
+            animation: pulse-loading 1.5s infinite;
+        }
+        @keyframes pulse-loading {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+        .batch-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .batch-detail-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+        .batch-detail-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        .batch-detail-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -268,76 +290,6 @@
             font-size: 1rem;
             color: #666;
             font-weight: 500;
-        }
-        .pagination-panel {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            text-align: center;
-            display: none;
-        }
-        .pagination-panel.active {
-            display: block;
-        }
-        .pagination-info {
-            font-size: 1.1rem;
-            color: #333;
-            margin-bottom: 15px;
-        }
-        .pagination-controls {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .pagination-btn {
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-        }
-        .pagination-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-        .pagination-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        .load-more-btn {
-            padding: 12px 30px;
-            background: linear-gradient(135deg, #ff6b35, #f7931e);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
-            animation: pulse-glow 2s infinite;
-        }
-        .load-more-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
-        }
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3); }
-            50% { box-shadow: 0 4px 20px rgba(255, 107, 53, 0.5); }
-            100% { box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3); }
         }
         .chart-container {
             background: rgba(255, 255, 255, 0.95);
@@ -487,21 +439,12 @@
             color: white;
             border: none;
         }
-        
         .processing-info.ultra-optimized {
             background: linear-gradient(135deg, #ff6b35, #f7931e);
             color: white;
             border: none;
             animation: pulse 2s infinite;
         }
-        
-        .processing-info.safe {
-            background: linear-gradient(135deg, #2196f3, #21cbf3);
-            color: white;
-            border: none;
-            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
-        }
-        
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.7); }
             70% { box-shadow: 0 0 0 10px rgba(255, 107, 53, 0); }
@@ -564,8 +507,8 @@
                 height: 300px;
             }
             
-            .pagination-controls {
-                flex-direction: column;
+            .batch-details {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -574,7 +517,7 @@
     <div class="container">
         <div class="header">
             <h1>Audio Monitoring Dashboard</h1>
-            <p>Track user audio uploads and analyze duration patterns</p>
+            <p>Track user audio uploads with automatic batch loading</p>
         </div>
         <div class="controls-panel">
             <div class="hospital-controls">
@@ -629,27 +572,37 @@
                         </select>
                     </div>
                 </div>
-                <button id="refreshData" class="refresh-btn">🎯 Load Data</button>
+                <button id="refreshData" class="refresh-btn">🚀 Load All Data</button>
             </div>
         </div>
         
-        <div class="user-progress" id="userProgress">
-            <div class="progress-header" id="progressHeader">Processing Users...</div>
-            <div class="progress-grid" id="progressGrid"></div>
-        </div>
-        
-        <!-- Pagination Panel -->
-        <div class="pagination-panel" id="paginationPanel">
-            <div class="pagination-info" id="paginationInfo">
-                Showing page 1 of 1 (0 total files)
+        <!-- Auto-Batching Progress Panel -->
+        <div class="batch-progress" id="batchProgress">
+            <div class="batch-header" id="batchHeader">🚀 Auto-Loading All Data Batches...</div>
+            <div class="batch-status">
+                <span id="batchStatusText">Loading batch 1...</span>
+                <span id="batchProgressText">0 / 0 files loaded</span>
             </div>
-            <div class="pagination-controls">
-                <button id="firstPageBtn" class="pagination-btn">First</button>
-                <button id="prevPageBtn" class="pagination-btn">Previous</button>
-                <span id="pageNumbers" style="margin: 0 15px; font-weight: 600;"></span>
-                <button id="nextPageBtn" class="pagination-btn">Next</button>
-                <button id="lastPageBtn" class="pagination-btn">Last</button>
-                <button id="loadMoreBtn" class="load-more-btn" style="margin-left: 20px;">📄 Load More Files</button>
+            <div class="batch-bar-container">
+                <div class="batch-bar pulsing" id="batchBar" style="width: 0%"></div>
+            </div>
+            <div class="batch-details">
+                <div class="batch-detail-item">
+                    <div class="batch-detail-number" id="currentBatchNum">1</div>
+                    <div class="batch-detail-label">Current Batch</div>
+                </div>
+                <div class="batch-detail-item">
+                    <div class="batch-detail-number" id="totalBatchesNum">-</div>
+                    <div class="batch-detail-label">Total Batches</div>
+                </div>
+                <div class="batch-detail-item">
+                    <div class="batch-detail-number" id="loadedFilesNum">0</div>
+                    <div class="batch-detail-label">Files Loaded</div>
+                </div>
+                <div class="batch-detail-item">
+                    <div class="batch-detail-number" id="totalFilesNum">-</div>
+                    <div class="batch-detail-label">Total Files</div>
+                </div>
             </div>
         </div>
         
@@ -660,20 +613,20 @@
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="totalFiles">0</div>
-                <div class="stat-label">Files This Page</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="totalAvailable">0</div>
-                <div class="stat-label">Total Available</div>
+                <div class="stat-label">Total Files</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="totalDuration">0h</div>
                 <div class="stat-label">Total Duration</div>
             </div>
+            <div class="stat-card">
+                <div class="stat-number" id="avgDuration">0m</div>
+                <div class="stat-label">Avg per User</div>
+            </div>
         </div>
         
         <div class="loading" id="loading">
-            <div>🚀 Processing with ultra-fast S3 prefix filtering per user...</div>
+            <div>🔍 Initializing auto-batch data loading...</div>
         </div>
         <div class="error" id="error"></div>
         <div id="hospitalInfo" class="hospital-info" style="display: none;"></div>
@@ -712,14 +665,9 @@
         
         let chartInstance = null;
         let currentHospital = '';
-        let currentPagination = {
-            currentPage: 1,
-            totalPages: 1,
-            totalFiles: 0,
-            hasMore: false,
-            pageSize: 100
-        };
-        let allUserStats = {}; // Accumulated stats across all pages
+        let isLoadingBatches = false;
+        let allAccumulatedFiles = []; // Store all files from all batches
+        let allUserStats = {}; // Accumulated user statistics
         
         // Hospital management
         const hospitals = [
@@ -828,186 +776,198 @@
                     // No additional controls needed
                     break;
             }
-            
-            // Reset pagination when changing modes
-            resetPagination();
         });
         
-        // Reset pagination state
-        function resetPagination() {
-            currentPagination = {
-                currentPage: 1,
-                totalPages: 1,
-                totalFiles: 0,
-                hasMore: false,
-                pageSize: 100
-            };
-            allUserStats = {};
-            updatePaginationUI();
-        }
-        
-        // Update pagination UI
-        function updatePaginationUI() {
-            const paginationPanel = document.getElementById('paginationPanel');
-            const paginationInfo = document.getElementById('paginationInfo');
-            const pageNumbers = document.getElementById('pageNumbers');
-            const firstBtn = document.getElementById('firstPageBtn');
-            const prevBtn = document.getElementById('prevPageBtn');
-            const nextBtn = document.getElementById('nextPageBtn');
-            const lastBtn = document.getElementById('lastPageBtn');
-            const loadMoreBtn = document.getElementById('loadMoreBtn');
-            
-            if (currentPagination.totalFiles > 0) {
-                paginationPanel.classList.add('active');
-                
-                const startIndex = ((currentPagination.currentPage - 1) * currentPagination.pageSize) + 1;
-                const endIndex = Math.min(currentPagination.currentPage * currentPagination.pageSize, currentPagination.totalFiles);
-                
-                paginationInfo.textContent = `Showing ${startIndex}-${endIndex} of ${currentPagination.totalFiles} files (Page ${currentPagination.currentPage} of ${currentPagination.totalPages})`;
-                pageNumbers.textContent = `Page ${currentPagination.currentPage} of ${currentPagination.totalPages}`;
-                
-                // Enable/disable buttons
-                firstBtn.disabled = currentPagination.currentPage <= 1;
-                prevBtn.disabled = currentPagination.currentPage <= 1;
-                nextBtn.disabled = !currentPagination.hasMore;
-                lastBtn.disabled = !currentPagination.hasMore;
-                
-                // Show load more button if there are more pages
-                loadMoreBtn.style.display = currentPagination.hasMore ? 'inline-block' : 'none';
-            } else {
-                paginationPanel.classList.remove('active');
-            }
-        }
-        
-        // ENHANCED: Handle different processing modes with pagination
-        async function fetchAudioData(startDate, endDate, hospitalFolder, page = 1, loadMore = false) {
+        // AUTO-BATCHING: Automatically load all batches until complete
+        async function loadAllDataWithAutoBatching(startDate, endDate, hospitalFolder) {
             const loading = document.getElementById('loading');
             const error = document.getElementById('error');
             const processingInfo = document.getElementById('processingInfo');
-            const userProgress = document.getElementById('userProgress');
+            const batchProgress = document.getElementById('batchProgress');
+            const refreshButton = document.getElementById('refreshData');
             
+            // Reset accumulated data
+            allAccumulatedFiles = [];
+            allUserStats = {};
+            isLoadingBatches = true;
+            
+            // Show loading states
             loading.classList.add('active');
             error.classList.remove('active');
             processingInfo.style.display = 'none';
-            userProgress.classList.remove('active');
+            batchProgress.classList.add('active');
+            refreshButton.disabled = true;
+            refreshButton.textContent = '⏳ Loading...';
+            
+            let currentBatch = 1;
+            let hasMoreBatches = true;
+            let totalFiles = 0;
+            let totalBatches = 1;
             
             try {
                 const usernameMode = document.getElementById('usernameMode').value;
-                console.log('Fetching with mode:', { hospitalFolder, startDate, endDate, usernameMode, page, loadMore });
+                console.log('🚀 Starting auto-batching process:', { hospitalFolder, startDate, endDate, usernameMode });
                 
-                let response;
-                
-                switch (usernameMode) {
-                    case 'single':
-                        response = await fetchSingleUser(hospitalFolder, startDate, endDate, page);
-                        break;
-                    case 'multiple':
-                        response = await fetchMultipleUsers(hospitalFolder, startDate, endDate, page);
-                        break;
-                    case 'all':
-                        response = await fetchAllUsers(hospitalFolder, startDate, endDate, page);
-                        break;
-                    default:
-                        throw new Error('Invalid username mode');
-                }
-                
-                console.log('API Response:', response);
-                
-                if (!response || !Array.isArray(response.files)) {
-                    throw new Error('Invalid API response: files array missing');
-                }
-                
-                // Update pagination state
-                if (response.pagination) {
-                    currentPagination = {
-                        currentPage: response.pagination.currentPage,
-                        totalPages: response.pagination.totalPages,
-                        totalFiles: response.pagination.totalFiles,
-                        hasMore: response.pagination.hasMore,
-                        pageSize: response.pagination.pageSize
-                    };
-                }
-                
-                // Show processing statistics based on mode
-                showProcessingStats(response, usernameMode);
-                
-                // Process data for visualization
-                const pageUserStats = {};
-                let totalFiles = 0;
-                let totalDuration = 0;
-                
-                for (const fileInfo of response.files) {
-                    const username = fileInfo.username || 'Unknown';
-                    const duration = fileInfo.duration || 0;
-                    const fileDate = new Date(fileInfo.recordingDate || fileInfo.lastModified);
+                while (hasMoreBatches && isLoadingBatches) {
+                    console.log(`📦 Loading batch ${currentBatch}...`);
                     
-                    if (!pageUserStats[username]) {
-                        pageUserStats[username] = {
-                            totalDuration: 0,
-                            fileCount: 0,
-                            files: []
-                        };
+                    // Update progress UI
+                    updateBatchProgress(currentBatch, totalBatches, allAccumulatedFiles.length, totalFiles, `Loading batch ${currentBatch}...`);
+                    
+                    let response;
+                    
+                    // Choose the appropriate API call based on mode
+                    switch (usernameMode) {
+                        case 'single':
+                            response = await fetchSingleUserBatch(hospitalFolder, startDate, endDate, currentBatch);
+                            break;
+                        case 'multiple':
+                            response = await fetchMultipleUsersBatch(hospitalFolder, startDate, endDate, currentBatch);
+                            break;
+                        case 'all':
+                            response = await fetchAllUsersBatch(hospitalFolder, startDate, endDate, currentBatch);
+                            break;
+                        default:
+                            throw new Error('Invalid username mode');
                     }
                     
-                    pageUserStats[username].totalDuration += duration;
-                    pageUserStats[username].fileCount += 1;
-                    pageUserStats[username].files.push({
-                        filename: fileInfo.filename,
-                        duration: duration,
-                        date: fileDate,
-                        presignedUrl: fileInfo.presignedUrl
-                    });
+                    console.log(`📦 Batch ${currentBatch} response:`, response);
                     
-                    totalFiles++;
-                    totalDuration += duration;
+                    if (!response || !Array.isArray(response.files)) {
+                        throw new Error('Invalid API response: files array missing');
+                    }
+                    
+                    // Add files from this batch to accumulated data
+                    allAccumulatedFiles.push(...response.files);
+                    
+                    // Update batch info from response
+                    if (response.batchInfo) {
+                        totalBatches = response.batchInfo.totalBatches || totalBatches;
+                        totalFiles = response.batchInfo.totalFilesFound || response.totalAvailable || totalFiles;
+                        hasMoreBatches = response.batchInfo.hasMoreBatches || response.hasMoreBatches || false;
+                    } else {
+                        hasMoreBatches = false; // Fallback if no batch info
+                    }
+                    
+                    // Accumulate user statistics
+                    accumulateUserStats(response.files);
+                    
+                    // Update progress
+                    const progressPercentage = totalFiles > 0 ? Math.round((allAccumulatedFiles.length / totalFiles) * 100) : 100;
+                    updateBatchProgress(currentBatch, totalBatches, allAccumulatedFiles.length, totalFiles, 
+                        hasMoreBatches ? `Loaded batch ${currentBatch} of ${totalBatches}` : 'All batches loaded!', progressPercentage);
+                    
+                    // Show processing stats from the latest batch
+                    showProcessingStats(response, usernameMode, currentBatch, totalBatches);
+                    
+                    // Update UI with accumulated data after each batch
+                    updateUIWithAccumulatedData();
+                    
+                    console.log(`✅ Batch ${currentBatch} complete: ${response.files.length} files added, ${allAccumulatedFiles.length} total accumulated`);
+                    
+                    // Move to next batch
+                    currentBatch++;
+                    
+                    // Small delay to prevent overwhelming the API
+                    if (hasMoreBatches) {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
                 }
                 
-                // Accumulate stats if loading more pages
-                if (loadMore) {
-                    // Merge with existing stats
-                    for (const [username, stats] of Object.entries(pageUserStats)) {
-                        if (!allUserStats[username]) {
-                            allUserStats[username] = {
-                                totalDuration: 0,
-                                fileCount: 0,
-                                files: []
-                            };
-                        }
-                        allUserStats[username].totalDuration += stats.totalDuration;
-                        allUserStats[username].fileCount += stats.fileCount;
-                        allUserStats[username].files.push(...stats.files);
-                    }
+                console.log('🎉 All batches loaded successfully!', {
+                    totalBatches: currentBatch - 1,
+                    totalFiles: allAccumulatedFiles.length,
+                    totalUsers: Object.keys(allUserStats).length
+                });
+                
+                // Final UI update
+                updateBatchProgress(currentBatch - 1, totalBatches, allAccumulatedFiles.length, totalFiles, 
+                    `✅ Complete! Loaded ${allAccumulatedFiles.length} files from ${currentBatch - 1} batches`, 100);
+                
+                // Hide batch progress after a delay
+                setTimeout(() => {
+                    batchProgress.classList.remove('active');
+                }, 3000);
+                
+                if (allAccumulatedFiles.length === 0) {
+                    document.getElementById('error').textContent = 'No audio files found for the selected criteria';
+                    document.getElementById('error').classList.add('active');
                 } else {
-                    // Fresh load - replace stats
-                    allUserStats = { ...pageUserStats };
+                    document.getElementById('error').classList.remove('active');
                 }
-                
-                console.log('Processed Data:', { pageUserStats, allUserStats, totalFiles, totalDuration });
-                
-                // Update pagination UI
-                updatePaginationUI();
-                
-                return { 
-                    userStats: pageUserStats, 
-                    allUserStats: allUserStats,
-                    totalFiles, 
-                    totalDuration,
-                    totalAvailable: response.totalAvailable || totalFiles,
-                    loadMore: loadMore
-                };
                 
             } catch (err) {
-                console.error('Error fetching data:', err);
+                console.error('Auto-batching error:', err);
                 error.textContent = `Error loading data: ${err.message}`;
                 error.classList.add('active');
-                return { userStats: {}, allUserStats: {}, totalFiles: 0, totalDuration: 0, totalAvailable: 0 };
+                batchProgress.classList.remove('active');
             } finally {
                 loading.classList.remove('active');
+                refreshButton.disabled = false;
+                refreshButton.textContent = '🚀 Load All Data';
+                isLoadingBatches = false;
             }
         }
         
-        // Fetch single user data with pagination
-        async function fetchSingleUser(hospitalFolder, startDate, endDate, page) {
+        // Accumulate user statistics from each batch
+        function accumulateUserStats(files) {
+            for (const fileInfo of files) {
+                const username = fileInfo.username || 'Unknown';
+                const duration = fileInfo.duration || 0;
+                const fileDate = new Date(fileInfo.recordingDate || fileInfo.lastModified);
+                
+                if (!allUserStats[username]) {
+                    allUserStats[username] = {
+                        totalDuration: 0,
+                        fileCount: 0,
+                        files: []
+                    };
+                }
+                
+                allUserStats[username].totalDuration += duration;
+                allUserStats[username].fileCount += 1;
+                allUserStats[username].files.push({
+                    filename: fileInfo.filename,
+                    duration: duration,
+                    date: fileDate,
+                    presignedUrl: fileInfo.presignedUrl
+                });
+            }
+        }
+        
+        // Update batch progress UI
+        function updateBatchProgress(currentBatch, totalBatches, loadedFiles, totalFiles, statusText, progressPercentage = null) {
+            document.getElementById('currentBatchNum').textContent = currentBatch;
+            document.getElementById('totalBatchesNum').textContent = totalBatches;
+            document.getElementById('loadedFilesNum').textContent = loadedFiles;
+            document.getElementById('totalFilesNum').textContent = totalFiles;
+            document.getElementById('batchStatusText').textContent = statusText;
+            document.getElementById('batchProgressText').textContent = `${loadedFiles} / ${totalFiles} files loaded`;
+            
+            if (progressPercentage !== null) {
+                const batchBar = document.getElementById('batchBar');
+                batchBar.style.width = `${progressPercentage}%`;
+                
+                if (progressPercentage >= 100) {
+                    batchBar.classList.remove('pulsing');
+                    batchBar.style.background = 'linear-gradient(135deg, #43a047, #66bb6a)';
+                }
+            }
+        }
+        
+        // Update UI with accumulated data
+        function updateUIWithAccumulatedData() {
+            const totalFiles = allAccumulatedFiles.length;
+            const totalDuration = Object.values(allUserStats).reduce((sum, user) => sum + user.totalDuration, 0);
+            const userCount = Object.keys(allUserStats).length;
+            
+            updateStats(allUserStats, totalFiles, totalDuration);
+            updateChart(allUserStats);
+            createUserCards(allUserStats);
+        }
+        
+        // Fetch single user batch
+        async function fetchSingleUserBatch(hospitalFolder, startDate, endDate, batchNumber) {
             const username = document.getElementById('usernameFilter').value.trim();
             
             if (!username) {
@@ -1019,13 +979,13 @@
                 startDate: startDate.toISOString(),
                 endDate: endDate.toISOString(),
                 username: username,
-                page: page,
-                pageSize: currentPagination.pageSize
+                batchNumber: batchNumber,
+                maxFilesPerBatch: 100
             });
         }
         
-        // Fetch multiple users data with progress tracking and pagination
-        async function fetchMultipleUsers(hospitalFolder, startDate, endDate, page) {
+        // Fetch multiple users batch
+        async function fetchMultipleUsersBatch(hospitalFolder, startDate, endDate, batchNumber) {
             const usernamesText = document.getElementById('usernamesList').value.trim();
             const processingMode = document.getElementById('processingMode').value;
             
@@ -1042,9 +1002,6 @@
                 throw new Error('No valid usernames found');
             }
             
-            // Show user progress tracking
-            showUserProgress(usernames, processingMode);
-            
             return await apiRequest('audio-list-multi-user', {
                 hospital: hospitalFolder,
                 startDate: startDate.toISOString(),
@@ -1053,51 +1010,25 @@
                 processingMode: processingMode,
                 maxConcurrentUsers: 5,
                 includeProgressDetails: true,
-                page: page,
-                pageSize: currentPagination.pageSize
+                batchNumber: batchNumber,
+                maxFilesPerBatch: 100
             });
         }
         
-        // Fetch all users data with pagination
-        async function fetchAllUsers(hospitalFolder, startDate, endDate, page) {
+        // Fetch all users batch
+        async function fetchAllUsersBatch(hospitalFolder, startDate, endDate, batchNumber) {
             return await apiRequest('audio-list', {
                 hospital: hospitalFolder,
                 startDate: startDate.toISOString(),
                 endDate: endDate.toISOString(),
-                page: page,
-                pageSize: currentPagination.pageSize
-                // No username = all users with client-side filtering
+                batchNumber: batchNumber,
+                maxFilesPerBatch: 100
+                // No username = all users
             });
         }
         
-        // Show user progress tracking
-        function showUserProgress(usernames, processingMode) {
-            const userProgress = document.getElementById('userProgress');
-            const progressHeader = document.getElementById('progressHeader');
-            const progressGrid = document.getElementById('progressGrid');
-            
-            progressHeader.textContent = `Processing ${usernames.length} users with ${processingMode} mode...`;
-            
-            // Create progress items for each user
-            progressGrid.innerHTML = '';
-            usernames.forEach((username, index) => {
-                const progressItem = document.createElement('div');
-                progressItem.className = 'progress-item';
-                progressItem.id = `progress-${username}`;
-                
-                progressItem.innerHTML = `
-                    <div class="progress-username">${username}</div>
-                    <div class="progress-details" id="details-${username}">Waiting...</div>
-                `;
-                
-                progressGrid.appendChild(progressItem);
-            });
-            
-            userProgress.classList.add('active');
-        }
-        
-        // Show processing statistics based on mode
-        function showProcessingStats(response, usernameMode) {
+        // Show processing statistics
+        function showProcessingStats(response, usernameMode, currentBatch, totalBatches) {
             const processingInfo = document.getElementById('processingInfo');
             let optimizationText;
             let cssClass;
@@ -1107,61 +1038,26 @@
                 const efficiency = parseInt(stats.efficiency);
                 
                 if (stats.ultraFastPrefixFiltering) {
-                    optimizationText = `🚀 MULTI-USER ULTRA-FAST: Processed ${stats.usersProcessed} users with S3 prefix filtering! Found ${stats.matchingFiles} files | ${stats.s3ApiCalls} S3 calls | ${stats.efficiency} efficiency | Mode: ${stats.processingMode}`;
-                    if (response.pagination) {
-                        optimizationText += ` | Page ${response.pagination.currentPage}/${response.pagination.totalPages}`;
-                    }
+                    optimizationText = `🚀 MULTI-USER ULTRA-FAST AUTO-BATCHING: Batch ${currentBatch}/${totalBatches} | Processed ${stats.usersProcessed} users | Found ${stats.matchingFiles} files | ${stats.s3ApiCalls} S3 calls | ${stats.efficiency} efficiency`;
                     cssClass = 'processing-info ultra-optimized';
-                } else if (efficiency > 15) {
-                    optimizationText = `⚡ MULTI-USER OPTIMIZED: Processed ${stats.usersProcessed} users | Found ${stats.matchingFiles} files | ${stats.efficiency} efficiency`;
-                    cssClass = 'processing-info optimized';
                 } else {
-                    optimizationText = `📊 MULTI-USER: Processed ${stats.usersProcessed} users | Found ${stats.matchingFiles} files | ${stats.efficiency} efficiency`;
-                    cssClass = 'processing-info';
+                    optimizationText = `⚡ MULTI-USER AUTO-BATCHING: Batch ${currentBatch}/${totalBatches} | Processed ${stats.usersProcessed} users | ${stats.efficiency} efficiency`;
+                    cssClass = 'processing-info optimized';
                 }
-                
-                // Update user progress with final results
-                if (stats.userResults) {
-                    stats.userResults.forEach(userResult => {
-                        const progressItem = document.getElementById(`progress-${userResult.username}`);
-                        const detailsElement = document.getElementById(`details-${userResult.username}`);
-                        
-                        if (progressItem && detailsElement) {
-                            if (userResult.filesFound > 0) {
-                                progressItem.className = 'progress-item ultra-fast';
-                                detailsElement.textContent = `${userResult.filesFound} files (${userResult.efficiency}%)`;
-                            } else {
-                                progressItem.className = 'progress-item completed';
-                                detailsElement.textContent = 'No files found';
-                            }
-                        }
-                    });
-                }
-                
             } else if (response.optimizationStats) {
-                // Single user or all users mode
                 const stats = response.optimizationStats;
                 const efficiency = parseInt(stats.efficiency);
-                const usedTruePrefix = stats.trueS3PrefixFiltering;
                 
-                if (usedTruePrefix) {
-                    optimizationText = `🎯 PREFIX OPTIMIZED: S3 server-side filtering! Generated ${stats.prefixesGenerated} prefixes | Only ${stats.objectsChecked} objects checked | Found ${stats.matchingFiles} matches | ${stats.efficiency} efficiency`;
+                if (stats.trueS3PrefixFiltering) {
+                    optimizationText = `🎯 AUTO-BATCHING: Batch ${currentBatch}/${totalBatches} | S3 prefix filtering | Found ${stats.matchingFiles} matches | ${stats.efficiency} efficiency`;
                     cssClass = 'processing-info ultra-optimized';
-                } else if (efficiency > 15) {
-                    optimizationText = `⚡ PREFIX FILTERED: Generated ${stats.prefixesGenerated || 'N/A'} prefixes | Checked ${stats.objectsChecked} objects | Found ${stats.matchingFiles} matches | ${stats.efficiency} efficiency`;
-                    cssClass = 'processing-info optimized';
                 } else {
-                    optimizationText = `📊 PROCESSED: Checked ${stats.objectsChecked} objects | Found ${stats.matchingFiles} matches | ${stats.efficiency} efficiency`;
-                    cssClass = 'processing-info';
+                    optimizationText = `📊 AUTO-BATCHING: Batch ${currentBatch}/${totalBatches} | Found ${stats.matchingFiles} matches | ${stats.efficiency} efficiency`;
+                    cssClass = 'processing-info optimized';
                 }
-                
-                if (response.pagination) {
-                    optimizationText += ` | ${stats.pagination || `Page ${response.pagination.currentPage}/${response.pagination.totalPages}`}`;
-                }
-                
-                if (usernameMode === 'all') {
-                    optimizationText += ` | 💡 TIP: Use specific usernames for ultra-fast S3 prefix filtering!`;
-                }
+            } else {
+                optimizationText = `🔄 AUTO-BATCHING: Processing batch ${currentBatch} of ${totalBatches}...`;
+                cssClass = 'processing-info';
             }
             
             processingInfo.textContent = optimizationText;
@@ -1170,8 +1066,8 @@
         }
         
         // Update statistics display
-        function updateStats(userStats, totalFiles, totalDuration, totalAvailable, loadMore = false) {
-            const userCount = Object.keys(allUserStats).length;
+        function updateStats(userStats, totalFiles, totalDuration) {
+            const userCount = Object.keys(userStats).length;
             const totalHours = Math.floor(totalDuration / 3600);
             const totalMinutes = Math.floor((totalDuration % 3600) / 60);
             const avgDurationPerUser = userCount > 0 ? totalDuration / userCount : 0;
@@ -1179,20 +1075,20 @@
             
             document.getElementById('totalUsers').textContent = userCount;
             document.getElementById('totalFiles').textContent = totalFiles;
-            document.getElementById('totalAvailable').textContent = totalAvailable;
             document.getElementById('totalDuration').textContent = totalHours > 0 ? `${totalHours}h ${totalMinutes}m` : `${totalMinutes}m`;
+            document.getElementById('avgDuration').textContent = `${avgMinutes}m`;
         }
         
-        // Create or update chart (using accumulated data for better overview)
+        // Create or update chart
         function updateChart(userStats) {
             const ctx = document.getElementById('durationChart').getContext('2d');
             
-            // Use accumulated stats for chart
-            const users = Object.keys(allUserStats).sort((a, b) => 
-                allUserStats[b].totalDuration - allUserStats[a].totalDuration
+            // Prepare data for chart
+            const users = Object.keys(userStats).sort((a, b) => 
+                userStats[b].totalDuration - userStats[a].totalDuration
             );
             
-            const durations = users.map(user => Math.round(allUserStats[user].totalDuration / 60)); // in minutes
+            const durations = users.map(user => Math.round(userStats[user].totalDuration / 60)); // in minutes
             
             // Generate colors
             const colors = users.map((_, index) => {
@@ -1231,7 +1127,7 @@
                                 label: function(context) {
                                     const username = context.label;
                                     const duration = context.raw;
-                                    const fileCount = allUserStats[username].fileCount;
+                                    const fileCount = userStats[username].fileCount;
                                     return [
                                         `Duration: ${duration} minutes`,
                                         `Files: ${fileCount}`,
@@ -1266,12 +1162,12 @@
             });
         }
         
-        // Create user cards (showing accumulated data)
+        // Create user cards
         function createUserCards(userStats) {
             const userList = document.getElementById('userList');
             userList.innerHTML = '';
             
-            const sortedUsers = Object.entries(allUserStats).sort((a, b) => 
+            const sortedUsers = Object.entries(userStats).sort((a, b) => 
                 b[1].totalDuration - a[1].totalDuration
             );
             
@@ -1299,8 +1195,8 @@
             });
         }
         
-        // Main refresh function
-        async function refreshData(page = 1, loadMore = false) {
+        // Main refresh function with auto-batching
+        async function refreshData() {
             if (!currentHospital) {
                 alert('Please select a hospital first');
                 return;
@@ -1323,77 +1219,17 @@
             const endDate = new Date(endDateStr);
             endDate.setHours(23, 59, 59, 999);
             
-            console.log('Starting optimized refresh with:', { currentHospital, startDate, endDate, page, loadMore });
+            console.log('🚀 Starting auto-batching data load:', { currentHospital, startDate, endDate });
             
-            try {
-                const result = await fetchAudioData(startDate, endDate, currentHospital, page, loadMore);
-                if (!result) {
-                    throw new Error('fetchAudioData returned undefined');
-                }
-                
-                const { userStats, allUserStats, totalFiles, totalDuration, totalAvailable } = result;
-                console.log('Updating UI with:', { userStats, allUserStats, totalFiles, totalDuration, totalAvailable });
-                
-                if (Object.keys(allUserStats).length === 0) {
-                    document.getElementById('error').textContent = 'No audio files found for the selected hospital and date range';
-                    document.getElementById('error').classList.add('active');
-                } else {
-                    document.getElementById('error').classList.remove('active');
-                }
-                
-                updateStats(userStats, totalFiles, totalDuration, totalAvailable, loadMore);
-                updateChart(userStats);
-                createUserCards(userStats);
-                
-            } catch (err) {
-                console.error('Refresh error:', err);
-                document.getElementById('error').textContent = `Failed to refresh data: ${err.message}`;
-                document.getElementById('error').classList.add('active');
-            }
-        }
-        
-        // Pagination navigation functions
-        async function goToFirstPage() {
-            resetPagination();
-            await refreshData(1, false);
-        }
-        
-        async function goToPreviousPage() {
-            if (currentPagination.currentPage > 1) {
-                await refreshData(currentPagination.currentPage - 1, false);
-            }
-        }
-        
-        async function goToNextPage() {
-            if (currentPagination.hasMore) {
-                await refreshData(currentPagination.currentPage + 1, false);
-            }
-        }
-        
-        async function goToLastPage() {
-            if (currentPagination.hasMore) {
-                await refreshData(currentPagination.totalPages, false);
-            }
-        }
-        
-        async function loadMoreData() {
-            if (currentPagination.hasMore) {
-                await refreshData(currentPagination.currentPage + 1, true);
-            }
+            // Clear previous data
+            clearDisplayData();
+            
+            // Start auto-batching process
+            await loadAllDataWithAutoBatching(startDate, endDate, currentHospital);
         }
         
         // Event listeners
-        document.getElementById('refreshData').addEventListener('click', () => {
-            resetPagination();
-            refreshData(1, false);
-        });
-        
-        // Pagination event listeners
-        document.getElementById('firstPageBtn').addEventListener('click', goToFirstPage);
-        document.getElementById('prevPageBtn').addEventListener('click', goToPreviousPage);
-        document.getElementById('nextPageBtn').addEventListener('click', goToNextPage);
-        document.getElementById('lastPageBtn').addEventListener('click', goToLastPage);
-        document.getElementById('loadMoreBtn').addEventListener('click', loadMoreData);
+        document.getElementById('refreshData').addEventListener('click', refreshData);
         
         document.getElementById('hospitalSelect').addEventListener('change', function() {
             currentHospital = this.value;
@@ -1402,7 +1238,6 @@
             // Clear previous data when switching hospitals
             if (currentHospital) {
                 clearDisplayData();
-                resetPagination();
             }
         });
         
@@ -1410,13 +1245,13 @@
         function clearDisplayData() {
             document.getElementById('totalUsers').textContent = '0';
             document.getElementById('totalFiles').textContent = '0';
-            document.getElementById('totalAvailable').textContent = '0';
             document.getElementById('totalDuration').textContent = '0h';
+            document.getElementById('avgDuration').textContent = '0m';
             document.getElementById('userList').innerHTML = '';
             document.getElementById('processingInfo').style.display = 'none';
-            document.getElementById('userProgress').classList.remove('active');
-            document.getElementById('paginationPanel').classList.remove('active');
+            document.getElementById('batchProgress').classList.remove('active');
             
+            allAccumulatedFiles = [];
             allUserStats = {};
             
             if (chartInstance) {
@@ -1466,7 +1301,6 @@
         initializeHospitals();
         initializeDates();
         updateHospitalInfo();
-        resetPagination();
         
         // Initialize username mode (trigger change event to set up initial state)
         document.getElementById('usernameMode').dispatchEvent(new Event('change'));
