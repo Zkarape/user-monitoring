@@ -1,51 +1,1475 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>User Audio Durations</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Monitoring Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .controls-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .hospital-controls {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .hospital-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .hospital-selector label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+        .select-wrapper {
+            position: relative;
+        }
+        .hospital-dropdown {
+            padding: 12px 40px 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            min-width: 200px;
+        }
+        .hospital-dropdown:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .select-wrapper::after {
+            content: '▼';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            pointer-events: none;
+            font-size: 0.8rem;
+        }
+        .add-hospital-btn {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #43a047, #66bb6a);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(67, 160, 71, 0.3);
+        }
+        .add-hospital-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 160, 71, 0.4);
+        }
+        .date-controls {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .date-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .date-group label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+        .date-input {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        .date-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .usernames-textarea {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            resize: vertical;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .usernames-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .user-progress {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: none;
+        }
+        .user-progress.active {
+            display: block;
+        }
+        .progress-header {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .progress-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .progress-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        .progress-item.processing {
+            border-left-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            animation: pulse-border 1.5s infinite;
+        }
+        .progress-item.completed {
+            border-left-color: #43a047;
+            background: rgba(67, 160, 71, 0.1);
+        }
+        .progress-item.ultra-fast {
+            border-left-color: #ff6b35;
+            background: rgba(255, 107, 53, 0.1);
+        }
+        @keyframes pulse-border {
+            0% { border-left-width: 4px; }
+            50% { border-left-width: 8px; }
+            100% { border-left-width: 4px; }
+        }
+        .progress-username {
+            font-weight: 600;
+            color: #333;
+        }
+        .progress-details {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        .refresh-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .stat-label {
+            font-size: 1rem;
+            color: #666;
+            font-weight: 500;
+        }
+        .pagination-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            text-align: center;
+            display: none;
+        }
+        .pagination-panel.active {
+            display: block;
+        }
+        .pagination-info {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .pagination-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        .pagination-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .pagination-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .load-more-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            animation: pulse-glow 2s infinite;
+        }
+        .load-more-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3); }
+            50% { box-shadow: 0 4px 20px rgba(255, 107, 53, 0.5); }
+            100% { box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3); }
+        }
+        .chart-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 30px;
+        }
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+        .loading.active {
+            display: block;
+        }
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #c33;
+            display: none;
+        }
+        .error.active {
+            display: block;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        .modal-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .modal-btn.primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .modal-btn.secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+        .modal-btn:hover {
+            transform: translateY(-2px);
+        }
+        .no-hospital-message {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .hospital-info {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .processing-info {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+            border: 1px solid #e0e0e0;
+        }
+        .processing-info.optimized {
+            background: linear-gradient(135deg, #43a047, #66bb6a);
+            color: white;
+            border: none;
+        }
+        
+        .processing-info.ultra-optimized {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            border: none;
+            animation: pulse 2s infinite;
+        }
+        
+        .processing-info.safe {
+            background: linear-gradient(135deg, #2196f3, #21cbf3);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 107, 53, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0); }
+        }
+        .user-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .user-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease;
+        }
+        .user-card:hover {
+            transform: translateY(-3px);
+        }
+        .user-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .user-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .duration {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        .file-count {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .hospital-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .date-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .chart-wrapper {
+                height: 300px;
+            }
+            
+            .pagination-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h2>Audio Duration per User</h2>
-  <form id="queryForm">
-    <label>Start Date (MMDD): <input type="text" id="startDate" required /></label><br><br>
-    <label>End Date (MMDD): <input type="text" id="endDate" required /></label><br><br>
-    <button type="submit">Get Durations</button>
-  </form>
-
-  <h3 id="resultTitle"></h3>
-  <ul id="resultList"></ul>
-
-  <script>
-    const lambdaUrl = 'https://u6vhhs7l23f73lrx3zy3ysqrzq0nqcds.lambda-url.us-east-1.on.aws/'; // Replace with your actual Lambda URL
-
-    document.getElementById('queryForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const start = document.getElementById('startDate').value;
-      const end = document.getElementById('endDate').value;
-
-      try {
-        const response = await fetch(`${lambdaUrl}?start=${start}&end=${end}`);
-        const data = await response.json();
-
-        const resultList = document.getElementById('resultList');
-        resultList.innerHTML = '';
-
-        if (response.ok) {
-          document.getElementById('resultTitle').innerText = "Total Duration per User (in seconds)";
-          for (const [user, duration] of Object.entries(data)) {
-            const li = document.createElement('li');
-            li.innerText = `${user}: ${duration} sec`;
-            resultList.appendChild(li);
-          }
-        } else {
-          document.getElementById('resultTitle').innerText = "Error";
-          resultList.innerHTML = `<li>${data.error}</li>`;
+    <div class="container">
+        <div class="header">
+            <h1>Audio Monitoring Dashboard</h1>
+            <p>Track user audio uploads and analyze duration patterns</p>
+        </div>
+        <div class="controls-panel">
+            <div class="hospital-controls">
+                <div class="hospital-selector">
+                    <label for="hospitalSelect">Select Hospital</label>
+                    <div class="select-wrapper">
+                        <select id="hospitalSelect" class="hospital-dropdown">
+                            <option value="">Choose Hospital...</option>
+                            <option value="Erebuni">Erebuni Hospital</option>
+                            <option value="Onco">Onco Hospital</option>
+                            <option value="Astghik">Astghik Hospital</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="addHospitalBtn" class="add-hospital-btn">+ Add Hospital</button>
+            </div>
+            
+            <div class="date-controls">
+                <div class="date-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" class="date-input">
+                </div>
+                <div class="date-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate" class="date-input">
+                </div>
+                <div class="date-group">
+                    <label for="usernameMode">User Selection</label>
+                    <div class="select-wrapper">
+                        <select id="usernameMode" class="hospital-dropdown">
+                            <option value="single">Single User</option>
+                            <option value="multiple">Multiple Users (Ultra-Fast Each)</option>
+                            <option value="all">All Users</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="date-group" id="singleUserGroup">
+                    <label for="usernameFilter">Username</label>
+                    <input type="text" id="usernameFilter" class="date-input" placeholder="e.g. Anush76cardio">
+                </div>
+                <div class="date-group" id="multipleUserGroup" style="display: none;">
+                    <label for="usernamesList">Usernames (one per line)</label>
+                    <textarea id="usernamesList" class="usernames-textarea" placeholder="Anush76cardio&#10;John&#10;doctor123&#10;cardiologist99" rows="4"></textarea>
+                </div>
+                <div class="date-group" id="processingModeGroup" style="display: none;">
+                    <label for="processingMode">Processing Mode</label>
+                    <div class="select-wrapper">
+                        <select id="processingMode" class="hospital-dropdown">
+                            <option value="progressive">📈 Progressive (Real-time Results)</option>
+                            <option value="parallel">⚡ Parallel (Fastest Overall)</option>
+                            <option value="sequential">🔄 Sequential (Simple)</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="refreshData" class="refresh-btn">🎯 Load Data</button>
+            </div>
+        </div>
+        
+        <div class="user-progress" id="userProgress">
+            <div class="progress-header" id="progressHeader">Processing Users...</div>
+            <div class="progress-grid" id="progressGrid"></div>
+        </div>
+        
+        <!-- Pagination Panel -->
+        <div class="pagination-panel" id="paginationPanel">
+            <div class="pagination-info" id="paginationInfo">
+                Showing page 1 of 1 (0 total files)
+            </div>
+            <div class="pagination-controls">
+                <button id="firstPageBtn" class="pagination-btn">First</button>
+                <button id="prevPageBtn" class="pagination-btn">Previous</button>
+                <span id="pageNumbers" style="margin: 0 15px; font-weight: 600;"></span>
+                <button id="nextPageBtn" class="pagination-btn">Next</button>
+                <button id="lastPageBtn" class="pagination-btn">Last</button>
+                <button id="loadMoreBtn" class="load-more-btn" style="margin-left: 20px;">📄 Load More Files</button>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalUsers">0</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalFiles">0</div>
+                <div class="stat-label">Files This Page</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalAvailable">0</div>
+                <div class="stat-label">Total Available</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalDuration">0h</div>
+                <div class="stat-label">Total Duration</div>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div>🚀 Processing with ultra-fast S3 prefix filtering per user...</div>
+        </div>
+        <div class="error" id="error"></div>
+        <div id="hospitalInfo" class="hospital-info" style="display: none;"></div>
+        <div id="processingInfo" class="processing-info" style="display: none;"></div>
+        <div id="noHospitalMessage" class="no-hospital-message">
+            <h3>🏥 Select a Hospital</h3>
+            <p>Please select a hospital from the dropdown above to view audio monitoring data.</p>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">User Audio Duration Analysis</div>
+            <div class="chart-wrapper">
+                <canvas id="durationChart"></canvas>
+            </div>
+        </div>
+        <div class="user-list" id="userList"></div>
+    </div>
+    
+    <!-- Add Hospital Modal -->
+    <div id="addHospitalModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">Add New Hospital</div>
+            <input type="text" id="hospitalNameInput" class="modal-input" placeholder="Enter hospital name...">
+            <div class="modal-buttons">
+                <button id="confirmAddHospital" class="modal-btn primary">Add Hospital</button>
+                <button id="cancelAddHospital" class="modal-btn secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Configuration - Update with your Lambda Function URL
+        const API_CONFIG = {
+            baseUrl: 'https://blike2u2ckpj53v6wyklakq7ca0izxmp.lambda-url.us-east-1.on.aws'
+        };
+        
+        let chartInstance = null;
+        let currentHospital = '';
+        let currentPagination = {
+            currentPage: 1,
+            totalPages: 1,
+            totalFiles: 0,
+            hasMore: false,
+            pageSize: 100
+        };
+        let allUserStats = {}; // Accumulated stats across all pages
+        
+        // Hospital management
+        const hospitals = [
+            { value: 'Erebuni', name: 'Erebuni Hospital' },
+            { value: 'Onco', name: 'Onco Hospital' },
+            { value: 'Astghik', name: 'Astghik Hospital' },
+        ];
+        
+        // Simplified API helper function
+        async function apiRequest(action, options = {}) {
+            console.log('Making request:', { action, options });
+            
+            const body = {
+                action: action,
+                ...options
+            };
+            
+            const response = await fetch(API_CONFIG.baseUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+            }
+            
+            return response.json();
         }
-      } catch (err) {
-        document.getElementById('resultTitle').innerText = "Request failed";
-        document.getElementById('resultList').innerHTML = `<li>${err.message}</li>`;
-      }
-    });
-  </script>
+        
+        // Initialize hospitals dropdown
+        function initializeHospitals() {
+            const select = document.getElementById('hospitalSelect');
+            select.innerHTML = '<option value="">Choose Hospital...</option>';
+            
+            hospitals.forEach(hospital => {
+                const option = document.createElement('option');
+                option.value = hospital.value;
+                option.textContent = hospital.name;
+                select.appendChild(option);
+            });
+        }
+        
+        // Add new hospital
+        function addHospital(name) {
+            const folderName = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+            const hospital = { value: folderName, name: name };
+            
+            hospitals.push(hospital);
+            initializeHospitals();
+            
+            // Select the newly added hospital
+            document.getElementById('hospitalSelect').value = folderName;
+            currentHospital = folderName;
+            updateHospitalInfo();
+        }
+        
+        // Update hospital info display
+        function updateHospitalInfo() {
+            const hospitalInfo = document.getElementById('hospitalInfo');
+            const noHospitalMessage = document.getElementById('noHospitalMessage');
+            
+            if (currentHospital) {
+                const hospital = hospitals.find(h => h.value === currentHospital);
+                hospitalInfo.textContent = `📊 Viewing data for: ${hospital ? hospital.name : currentHospital}`;
+                hospitalInfo.style.display = 'block';
+                noHospitalMessage.style.display = 'none';
+            } else {
+                hospitalInfo.style.display = 'none';
+                noHospitalMessage.style.display = 'block';
+            }
+        }
+        
+        // Initialize date inputs with default values
+        function initializeDates() {
+            const today = new Date();
+            const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            document.getElementById('startDate').value = oneWeekAgo.toISOString().split('T')[0];
+        }
+        
+        // Handle username mode changes
+        document.getElementById('usernameMode').addEventListener('change', function() {
+            const mode = this.value;
+            const singleGroup = document.getElementById('singleUserGroup');
+            const multipleGroup = document.getElementById('multipleUserGroup');
+            const processingGroup = document.getElementById('processingModeGroup');
+            
+            // Hide all groups first
+            singleGroup.style.display = 'none';
+            multipleGroup.style.display = 'none';
+            processingGroup.style.display = 'none';
+            
+            // Show relevant groups based on mode
+            switch (mode) {
+                case 'single':
+                    singleGroup.style.display = 'flex';
+                    break;
+                case 'multiple':
+                    multipleGroup.style.display = 'flex';
+                    processingGroup.style.display = 'flex';
+                    break;
+                case 'all':
+                    // No additional controls needed
+                    break;
+            }
+            
+            // Reset pagination when changing modes
+            resetPagination();
+        });
+        
+        // Reset pagination state
+        function resetPagination() {
+            currentPagination = {
+                currentPage: 1,
+                totalPages: 1,
+                totalFiles: 0,
+                hasMore: false,
+                pageSize: 100
+            };
+            allUserStats = {};
+            updatePaginationUI();
+        }
+        
+        // Update pagination UI
+        function updatePaginationUI() {
+            const paginationPanel = document.getElementById('paginationPanel');
+            const paginationInfo = document.getElementById('paginationInfo');
+            const pageNumbers = document.getElementById('pageNumbers');
+            const firstBtn = document.getElementById('firstPageBtn');
+            const prevBtn = document.getElementById('prevPageBtn');
+            const nextBtn = document.getElementById('nextPageBtn');
+            const lastBtn = document.getElementById('lastPageBtn');
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            
+            if (currentPagination.totalFiles > 0) {
+                paginationPanel.classList.add('active');
+                
+                const startIndex = ((currentPagination.currentPage - 1) * currentPagination.pageSize) + 1;
+                const endIndex = Math.min(currentPagination.currentPage * currentPagination.pageSize, currentPagination.totalFiles);
+                
+                paginationInfo.textContent = `Showing ${startIndex}-${endIndex} of ${currentPagination.totalFiles} files (Page ${currentPagination.currentPage} of ${currentPagination.totalPages})`;
+                pageNumbers.textContent = `Page ${currentPagination.currentPage} of ${currentPagination.totalPages}`;
+                
+                // Enable/disable buttons
+                firstBtn.disabled = currentPagination.currentPage <= 1;
+                prevBtn.disabled = currentPagination.currentPage <= 1;
+                nextBtn.disabled = !currentPagination.hasMore;
+                lastBtn.disabled = !currentPagination.hasMore;
+                
+                // Show load more button if there are more pages
+                loadMoreBtn.style.display = currentPagination.hasMore ? 'inline-block' : 'none';
+            } else {
+                paginationPanel.classList.remove('active');
+            }
+        }
+        
+        // ENHANCED: Handle different processing modes with pagination
+        async function fetchAudioData(startDate, endDate, hospitalFolder, page = 1, loadMore = false) {
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const processingInfo = document.getElementById('processingInfo');
+            const userProgress = document.getElementById('userProgress');
+            
+            loading.classList.add('active');
+            error.classList.remove('active');
+            processingInfo.style.display = 'none';
+            userProgress.classList.remove('active');
+            
+            try {
+                const usernameMode = document.getElementById('usernameMode').value;
+                console.log('Fetching with mode:', { hospitalFolder, startDate, endDate, usernameMode, page, loadMore });
+                
+                let response;
+                
+                switch (usernameMode) {
+                    case 'single':
+                        response = await fetchSingleUser(hospitalFolder, startDate, endDate, page);
+                        break;
+                    case 'multiple':
+                        response = await fetchMultipleUsers(hospitalFolder, startDate, endDate, page);
+                        break;
+                    case 'all':
+                        response = await fetchAllUsers(hospitalFolder, startDate, endDate, page);
+                        break;
+                    default:
+                        throw new Error('Invalid username mode');
+                }
+                
+                console.log('API Response:', response);
+                
+                if (!response || !Array.isArray(response.files)) {
+                    throw new Error('Invalid API response: files array missing');
+                }
+                
+                // Update pagination state
+                if (response.pagination) {
+                    currentPagination = {
+                        currentPage: response.pagination.currentPage,
+                        totalPages: response.pagination.totalPages,
+                        totalFiles: response.pagination.totalFiles,
+                        hasMore: response.pagination.hasMore,
+                        pageSize: response.pagination.pageSize
+                    };
+                }
+                
+                // Show processing statistics based on mode
+                showProcessingStats(response, usernameMode);
+                
+                // Process data for visualization
+                const pageUserStats = {};
+                let totalFiles = 0;
+                let totalDuration = 0;
+                
+                for (const fileInfo of response.files) {
+                    const username = fileInfo.username || 'Unknown';
+                    const duration = fileInfo.duration || 0;
+                    const fileDate = new Date(fileInfo.recordingDate || fileInfo.lastModified);
+                    
+                    if (!pageUserStats[username]) {
+                        pageUserStats[username] = {
+                            totalDuration: 0,
+                            fileCount: 0,
+                            files: []
+                        };
+                    }
+                    
+                    pageUserStats[username].totalDuration += duration;
+                    pageUserStats[username].fileCount += 1;
+                    pageUserStats[username].files.push({
+                        filename: fileInfo.filename,
+                        duration: duration,
+                        date: fileDate,
+                        presignedUrl: fileInfo.presignedUrl
+                    });
+                    
+                    totalFiles++;
+                    totalDuration += duration;
+                }
+                
+                // Accumulate stats if loading more pages
+                if (loadMore) {
+                    // Merge with existing stats
+                    for (const [username, stats] of Object.entries(pageUserStats)) {
+                        if (!allUserStats[username]) {
+                            allUserStats[username] = {
+                                totalDuration: 0,
+                                fileCount: 0,
+                                files: []
+                            };
+                        }
+                        allUserStats[username].totalDuration += stats.totalDuration;
+                        allUserStats[username].fileCount += stats.fileCount;
+                        allUserStats[username].files.push(...stats.files);
+                    }
+                } else {
+                    // Fresh load - replace stats
+                    allUserStats = { ...pageUserStats };
+                }
+                
+                console.log('Processed Data:', { pageUserStats, allUserStats, totalFiles, totalDuration });
+                
+                // Update pagination UI
+                updatePaginationUI();
+                
+                return { 
+                    userStats: pageUserStats, 
+                    allUserStats: allUserStats,
+                    totalFiles, 
+                    totalDuration,
+                    totalAvailable: response.totalAvailable || totalFiles,
+                    loadMore: loadMore
+                };
+                
+            } catch (err) {
+                console.error('Error fetching data:', err);
+                error.textContent = `Error loading data: ${err.message}`;
+                error.classList.add('active');
+                return { userStats: {}, allUserStats: {}, totalFiles: 0, totalDuration: 0, totalAvailable: 0 };
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+        
+        // Fetch single user data with pagination
+        async function fetchSingleUser(hospitalFolder, startDate, endDate, page) {
+            const username = document.getElementById('usernameFilter').value.trim();
+            
+            if (!username) {
+                throw new Error('Username is required for single user mode');
+            }
+            
+            return await apiRequest('audio-list', {
+                hospital: hospitalFolder,
+                startDate: startDate.toISOString(),
+                endDate: endDate.toISOString(),
+                username: username,
+                page: page,
+                pageSize: currentPagination.pageSize
+            });
+        }
+        
+        // Fetch multiple users data with progress tracking and pagination
+        async function fetchMultipleUsers(hospitalFolder, startDate, endDate, page) {
+            const usernamesText = document.getElementById('usernamesList').value.trim();
+            const processingMode = document.getElementById('processingMode').value;
+            
+            if (!usernamesText) {
+                throw new Error('Please enter at least one username');
+            }
+            
+            // Parse usernames (one per line, filter empty lines)
+            const usernames = usernamesText.split('\n')
+                .map(u => u.trim())
+                .filter(u => u.length > 0);
+            
+            if (usernames.length === 0) {
+                throw new Error('No valid usernames found');
+            }
+            
+            // Show user progress tracking
+            showUserProgress(usernames, processingMode);
+            
+            return await apiRequest('audio-list-multi-user', {
+                hospital: hospitalFolder,
+                startDate: startDate.toISOString(),
+                endDate: endDate.toISOString(),
+                usernames: usernames,
+                processingMode: processingMode,
+                maxConcurrentUsers: 5,
+                includeProgressDetails: true,
+                page: page,
+                pageSize: currentPagination.pageSize
+            });
+        }
+        
+        // Fetch all users data with pagination
+        async function fetchAllUsers(hospitalFolder, startDate, endDate, page) {
+            return await apiRequest('audio-list', {
+                hospital: hospitalFolder,
+                startDate: startDate.toISOString(),
+                endDate: endDate.toISOString(),
+                page: page,
+                pageSize: currentPagination.pageSize
+                // No username = all users with client-side filtering
+            });
+        }
+        
+        // Show user progress tracking
+        function showUserProgress(usernames, processingMode) {
+            const userProgress = document.getElementById('userProgress');
+            const progressHeader = document.getElementById('progressHeader');
+            const progressGrid = document.getElementById('progressGrid');
+            
+            progressHeader.textContent = `Processing ${usernames.length} users with ${processingMode} mode...`;
+            
+            // Create progress items for each user
+            progressGrid.innerHTML = '';
+            usernames.forEach((username, index) => {
+                const progressItem = document.createElement('div');
+                progressItem.className = 'progress-item';
+                progressItem.id = `progress-${username}`;
+                
+                progressItem.innerHTML = `
+                    <div class="progress-username">${username}</div>
+                    <div class="progress-details" id="details-${username}">Waiting...</div>
+                `;
+                
+                progressGrid.appendChild(progressItem);
+            });
+            
+            userProgress.classList.add('active');
+        }
+        
+        // Show processing statistics based on mode
+        function showProcessingStats(response, usernameMode) {
+            const processingInfo = document.getElementById('processingInfo');
+            let optimizationText;
+            let cssClass;
+            
+            if (usernameMode === 'multiple' && response.multiUserStats) {
+                const stats = response.multiUserStats;
+                const efficiency = parseInt(stats.efficiency);
+                
+                if (stats.ultraFastPrefixFiltering) {
+                    optimizationText = `🚀 MULTI-USER ULTRA-FAST: Processed ${stats.usersProcessed} users with S3 prefix filtering! Found ${stats.matchingFiles} files | ${stats.s3ApiCalls} S3 calls | ${stats.efficiency} efficiency | Mode: ${stats.processingMode}`;
+                    if (response.pagination) {
+                        optimizationText += ` | Page ${response.pagination.currentPage}/${response.pagination.totalPages}`;
+                    }
+                    cssClass = 'processing-info ultra-optimized';
+                } else if (efficiency > 15) {
+                    optimizationText = `⚡ MULTI-USER OPTIMIZED: Processed ${stats.usersProcessed} users | Found ${stats.matchingFiles} files | ${stats.efficiency} efficiency`;
+                    cssClass = 'processing-info optimized';
+                } else {
+                    optimizationText = `📊 MULTI-USER: Processed ${stats.usersProcessed} users | Found ${stats.matchingFiles} files | ${stats.efficiency} efficiency`;
+                    cssClass = 'processing-info';
+                }
+                
+                // Update user progress with final results
+                if (stats.userResults) {
+                    stats.userResults.forEach(userResult => {
+                        const progressItem = document.getElementById(`progress-${userResult.username}`);
+                        const detailsElement = document.getElementById(`details-${userResult.username}`);
+                        
+                        if (progressItem && detailsElement) {
+                            if (userResult.filesFound > 0) {
+                                progressItem.className = 'progress-item ultra-fast';
+                                detailsElement.textContent = `${userResult.filesFound} files (${userResult.efficiency}%)`;
+                            } else {
+                                progressItem.className = 'progress-item completed';
+                                detailsElement.textContent = 'No files found';
+                            }
+                        }
+                    });
+                }
+                
+            } else if (response.optimizationStats) {
+                // Single user or all users mode
+                const stats = response.optimizationStats;
+                const efficiency = parseInt(stats.efficiency);
+                const usedTruePrefix = stats.trueS3PrefixFiltering;
+                
+                if (usedTruePrefix) {
+                    optimizationText = `🎯 PREFIX OPTIMIZED: S3 server-side filtering! Generated ${stats.prefixesGenerated} prefixes | Only ${stats.objectsChecked} objects checked | Found ${stats.matchingFiles} matches | ${stats.efficiency} efficiency`;
+                    cssClass = 'processing-info ultra-optimized';
+                } else if (efficiency > 15) {
+                    optimizationText = `⚡ PREFIX FILTERED: Generated ${stats.prefixesGenerated || 'N/A'} prefixes | Checked ${stats.objectsChecked} objects | Found ${stats.matchingFiles} matches | ${stats.efficiency} efficiency`;
+                    cssClass = 'processing-info optimized';
+                } else {
+                    optimizationText = `📊 PROCESSED: Checked ${stats.objectsChecked} objects | Found ${stats.matchingFiles} matches | ${stats.efficiency} efficiency`;
+                    cssClass = 'processing-info';
+                }
+                
+                if (response.pagination) {
+                    optimizationText += ` | ${stats.pagination || `Page ${response.pagination.currentPage}/${response.pagination.totalPages}`}`;
+                }
+                
+                if (usernameMode === 'all') {
+                    optimizationText += ` | 💡 TIP: Use specific usernames for ultra-fast S3 prefix filtering!`;
+                }
+            }
+            
+            processingInfo.textContent = optimizationText;
+            processingInfo.className = cssClass;
+            processingInfo.style.display = 'block';
+        }
+        
+        // Update statistics display
+        function updateStats(userStats, totalFiles, totalDuration, totalAvailable, loadMore = false) {
+            const userCount = Object.keys(allUserStats).length;
+            const totalHours = Math.floor(totalDuration / 3600);
+            const totalMinutes = Math.floor((totalDuration % 3600) / 60);
+            const avgDurationPerUser = userCount > 0 ? totalDuration / userCount : 0;
+            const avgMinutes = Math.round(avgDurationPerUser / 60);
+            
+            document.getElementById('totalUsers').textContent = userCount;
+            document.getElementById('totalFiles').textContent = totalFiles;
+            document.getElementById('totalAvailable').textContent = totalAvailable;
+            document.getElementById('totalDuration').textContent = totalHours > 0 ? `${totalHours}h ${totalMinutes}m` : `${totalMinutes}m`;
+        }
+        
+        // Create or update chart (using accumulated data for better overview)
+        function updateChart(userStats) {
+            const ctx = document.getElementById('durationChart').getContext('2d');
+            
+            // Use accumulated stats for chart
+            const users = Object.keys(allUserStats).sort((a, b) => 
+                allUserStats[b].totalDuration - allUserStats[a].totalDuration
+            );
+            
+            const durations = users.map(user => Math.round(allUserStats[user].totalDuration / 60)); // in minutes
+            
+            // Generate colors
+            const colors = users.map((_, index) => {
+                const hue = (index * 137.5) % 360;
+                return `hsla(${hue}, 70%, 60%, 0.8)`;
+            });
+            
+            // Destroy existing chart
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+            
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: users,
+                    datasets: [{
+                        label: 'Duration (minutes)',
+                        data: durations,
+                        backgroundColor: colors,
+                        borderColor: colors.map(color => color.replace('0.8', '1')),
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const username = context.label;
+                                    const duration = context.raw;
+                                    const fileCount = allUserStats[username].fileCount;
+                                    return [
+                                        `Duration: ${duration} minutes`,
+                                        `Files: ${fileCount}`,
+                                        `Avg per file: ${Math.round(duration / fileCount)} min`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Duration (minutes)'
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Users'
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Create user cards (showing accumulated data)
+        function createUserCards(userStats) {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+            
+            const sortedUsers = Object.entries(allUserStats).sort((a, b) => 
+                b[1].totalDuration - a[1].totalDuration
+            );
+            
+            sortedUsers.forEach(([username, stats]) => {
+                const card = document.createElement('div');
+                card.className = 'user-card';
+                
+                const durationMinutes = Math.round(stats.totalDuration / 60);
+                const durationHours = Math.floor(durationMinutes / 60);
+                const remainingMinutes = durationMinutes % 60;
+                
+                const displayDuration = durationHours > 0 
+                    ? `${durationHours}h ${remainingMinutes}m`
+                    : `${durationMinutes}m`;
+                
+                card.innerHTML = `
+                    <div class="user-name">${username}</div>
+                    <div class="user-stats">
+                        <div class="duration">${displayDuration}</div>
+                        <div class="file-count">${stats.fileCount} files</div>
+                    </div>
+                `;
+                
+                userList.appendChild(card);
+            });
+        }
+        
+        // Main refresh function
+        async function refreshData(page = 1, loadMore = false) {
+            if (!currentHospital) {
+                alert('Please select a hospital first');
+                return;
+            }
+            
+            const startDateStr = document.getElementById('startDate').value;
+            const endDateStr = document.getElementById('endDate').value;
+            
+            if (!startDateStr || !endDateStr) {
+                alert('Please select both start and end dates');
+                return;
+            }
+            
+            if (new Date(startDateStr) > new Date(endDateStr)) {
+                alert('Start date must be before end date');
+                return;
+            }
+            
+            const startDate = new Date(startDateStr);
+            const endDate = new Date(endDateStr);
+            endDate.setHours(23, 59, 59, 999);
+            
+            console.log('Starting optimized refresh with:', { currentHospital, startDate, endDate, page, loadMore });
+            
+            try {
+                const result = await fetchAudioData(startDate, endDate, currentHospital, page, loadMore);
+                if (!result) {
+                    throw new Error('fetchAudioData returned undefined');
+                }
+                
+                const { userStats, allUserStats, totalFiles, totalDuration, totalAvailable } = result;
+                console.log('Updating UI with:', { userStats, allUserStats, totalFiles, totalDuration, totalAvailable });
+                
+                if (Object.keys(allUserStats).length === 0) {
+                    document.getElementById('error').textContent = 'No audio files found for the selected hospital and date range';
+                    document.getElementById('error').classList.add('active');
+                } else {
+                    document.getElementById('error').classList.remove('active');
+                }
+                
+                updateStats(userStats, totalFiles, totalDuration, totalAvailable, loadMore);
+                updateChart(userStats);
+                createUserCards(userStats);
+                
+            } catch (err) {
+                console.error('Refresh error:', err);
+                document.getElementById('error').textContent = `Failed to refresh data: ${err.message}`;
+                document.getElementById('error').classList.add('active');
+            }
+        }
+        
+        // Pagination navigation functions
+        async function goToFirstPage() {
+            resetPagination();
+            await refreshData(1, false);
+        }
+        
+        async function goToPreviousPage() {
+            if (currentPagination.currentPage > 1) {
+                await refreshData(currentPagination.currentPage - 1, false);
+            }
+        }
+        
+        async function goToNextPage() {
+            if (currentPagination.hasMore) {
+                await refreshData(currentPagination.currentPage + 1, false);
+            }
+        }
+        
+        async function goToLastPage() {
+            if (currentPagination.hasMore) {
+                await refreshData(currentPagination.totalPages, false);
+            }
+        }
+        
+        async function loadMoreData() {
+            if (currentPagination.hasMore) {
+                await refreshData(currentPagination.currentPage + 1, true);
+            }
+        }
+        
+        // Event listeners
+        document.getElementById('refreshData').addEventListener('click', () => {
+            resetPagination();
+            refreshData(1, false);
+        });
+        
+        // Pagination event listeners
+        document.getElementById('firstPageBtn').addEventListener('click', goToFirstPage);
+        document.getElementById('prevPageBtn').addEventListener('click', goToPreviousPage);
+        document.getElementById('nextPageBtn').addEventListener('click', goToNextPage);
+        document.getElementById('lastPageBtn').addEventListener('click', goToLastPage);
+        document.getElementById('loadMoreBtn').addEventListener('click', loadMoreData);
+        
+        document.getElementById('hospitalSelect').addEventListener('change', function() {
+            currentHospital = this.value;
+            updateHospitalInfo();
+            
+            // Clear previous data when switching hospitals
+            if (currentHospital) {
+                clearDisplayData();
+                resetPagination();
+            }
+        });
+        
+        // Clear display data helper
+        function clearDisplayData() {
+            document.getElementById('totalUsers').textContent = '0';
+            document.getElementById('totalFiles').textContent = '0';
+            document.getElementById('totalAvailable').textContent = '0';
+            document.getElementById('totalDuration').textContent = '0h';
+            document.getElementById('userList').innerHTML = '';
+            document.getElementById('processingInfo').style.display = 'none';
+            document.getElementById('userProgress').classList.remove('active');
+            document.getElementById('paginationPanel').classList.remove('active');
+            
+            allUserStats = {};
+            
+            if (chartInstance) {
+                chartInstance.destroy();
+                chartInstance = null;
+            }
+        }
+        
+        // Add Hospital Modal functionality
+        document.getElementById('addHospitalBtn').addEventListener('click', function() {
+            document.getElementById('addHospitalModal').classList.add('active');
+            document.getElementById('hospitalNameInput').focus();
+        });
+        
+        document.getElementById('cancelAddHospital').addEventListener('click', function() {
+            document.getElementById('addHospitalModal').classList.remove('active');
+            document.getElementById('hospitalNameInput').value = '';
+        });
+        
+        document.getElementById('confirmAddHospital').addEventListener('click', function() {
+            const hospitalName = document.getElementById('hospitalNameInput').value.trim();
+            if (hospitalName) {
+                addHospital(hospitalName);
+                document.getElementById('addHospitalModal').classList.remove('active');
+                document.getElementById('hospitalNameInput').value = '';
+            } else {
+                alert('Please enter a hospital name');
+            }
+        });
+        
+        // Close modal when clicking outside
+        document.getElementById('addHospitalModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+                document.getElementById('hospitalNameInput').value = '';
+            }
+        });
+        
+        // Enter key support for modal
+        document.getElementById('hospitalNameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('confirmAddHospital').click();
+            }
+        });
+        
+        // Initialize
+        initializeHospitals();
+        initializeDates();
+        updateHospitalInfo();
+        resetPagination();
+        
+        // Initialize username mode (trigger change event to set up initial state)
+        document.getElementById('usernameMode').dispatchEvent(new Event('change'));
+    </script>
 </body>
 </html>
