@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,44 +12,51 @@
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: #333;
         }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
+
         .header {
             text-align: center;
             margin-bottom: 40px;
             color: white;
         }
+
         .header h1 {
             font-size: 3rem;
             font-weight: 300;
             margin-bottom: 10px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
+
         .header p {
             font-size: 1.2rem;
             opacity: 0.9;
         }
+
         .mode-selector {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 20px;
             margin-bottom: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             display: flex;
             gap: 15px;
             justify-content: center;
             align-items: center;
         }
+
         .mode-btn {
             padding: 15px 30px;
             border: 2px solid #667eea;
@@ -60,24 +68,28 @@
             background: white;
             color: #667eea;
         }
+
         .mode-btn.active {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             transform: scale(1.05);
         }
+
         .mode-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
+
         .controls-panel {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 30px;
             margin-bottom: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
+
         .hospital-controls {
             display: flex;
             gap: 20px;
@@ -88,19 +100,23 @@
             padding-bottom: 25px;
             border-bottom: 1px solid #e0e0e0;
         }
+
         .hospital-selector {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
+
         .hospital-selector label {
             font-weight: 600;
             color: #555;
             font-size: 0.9rem;
         }
+
         .select-wrapper {
             position: relative;
         }
+
         .hospital-dropdown {
             padding: 12px 40px 12px 16px;
             border: 2px solid #e0e0e0;
@@ -112,11 +128,13 @@
             appearance: none;
             min-width: 200px;
         }
+
         .hospital-dropdown:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
+
         .select-wrapper::after {
             content: '▼';
             position: absolute;
@@ -127,6 +145,7 @@
             pointer-events: none;
             font-size: 0.8rem;
         }
+
         .date-controls {
             display: flex;
             gap: 20px;
@@ -134,16 +153,19 @@
             flex-wrap: wrap;
             justify-content: center;
         }
+
         .date-group {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
+
         .date-group label {
             font-weight: 600;
             color: #555;
             font-size: 0.9rem;
         }
+
         .date-input {
             padding: 12px 16px;
             border: 2px solid #e0e0e0;
@@ -152,11 +174,13 @@
             transition: all 0.3s ease;
             background: white;
         }
+
         .date-input:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
+
         .action-btn {
             padding: 12px 24px;
             background: linear-gradient(135deg, #667eea, #764ba2);
@@ -169,58 +193,68 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
+
         .action-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
+
         .action-btn:disabled {
             background: #ccc;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
+
         .action-btn.success {
             background: linear-gradient(135deg, #43a047, #66bb6a);
         }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
+
         .stat-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 16px;
             padding: 25px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             transition: transform 0.3s ease;
         }
+
         .stat-card:hover {
             transform: translateY(-5px);
         }
+
         .stat-number {
             font-size: 2.5rem;
             font-weight: 700;
             color: #667eea;
             margin-bottom: 10px;
         }
+
         .stat-label {
             font-size: 1rem;
             color: #666;
             font-weight: 500;
         }
+
         .chart-container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             margin-bottom: 30px;
         }
+
         .chart-title {
             font-size: 1.5rem;
             font-weight: 600;
@@ -228,10 +262,12 @@
             margin-bottom: 20px;
             text-align: center;
         }
+
         .chart-wrapper {
             position: relative;
             height: 400px;
         }
+
         .loading {
             display: none;
             text-align: center;
@@ -239,110 +275,134 @@
             color: #667eea;
             font-size: 1.1rem;
         }
+
         .loading.active {
             display: block;
         }
-        .error, .success {
+
+        .error,
+        .success {
             padding: 15px;
             border-radius: 8px;
             margin: 20px 0;
             border-left: 4px solid;
             display: none;
         }
+
         .error {
             background: #fee;
             color: #c33;
             border-color: #c33;
         }
+
         .success {
             background: #efe;
             color: #3c3;
             border-color: #3c3;
         }
-        .error.active, .success.active {
+
+        .error.active,
+        .success.active {
             display: block;
         }
+
         .user-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
             margin-top: 30px;
         }
+
         .user-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             transition: transform 0.3s ease;
         }
+
         .user-card:hover {
             transform: translateY(-3px);
         }
+
         .user-name {
             font-size: 1.2rem;
             font-weight: 600;
             color: #333;
             margin-bottom: 10px;
         }
+
         .user-stats {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+
         .duration {
             font-size: 1.5rem;
             font-weight: 700;
             color: #667eea;
         }
+
         .file-count {
             font-size: 0.9rem;
             color: #666;
         }
+
         .preload-panel {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 30px;
             margin-bottom: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
+
         .preload-status {
             background: #f8f9fa;
             padding: 20px;
             border-radius: 12px;
             margin-top: 20px;
         }
+
         .preload-status h3 {
             margin-bottom: 15px;
             color: #333;
         }
+
         .status-item {
             display: flex;
             justify-content: space-between;
             padding: 10px;
             border-bottom: 1px solid #e0e0e0;
         }
+
         .status-item:last-child {
             border-bottom: none;
         }
+
         .status-label {
             font-weight: 600;
             color: #555;
         }
+
         .status-value {
             color: #667eea;
             font-weight: 600;
         }
+
         #viewModeControls {
             display: none;
         }
+
         #preloadModeControls {
             display: none;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -396,17 +456,30 @@
             </div>
 
             <!-- PRE-LOAD MODE CONTROLS -->
-            <div id="preloadModeControls">
-                <div class="date-controls">
+            <!-- Replace the whole #preloadModeControls content with this -->
+
+            <div id="preloadModeControls" style="display: none;">
+                <div
+                    style="text-align: center; margin-bottom: 20px; color: #444; font-size: 0.95rem; line-height: 1.4;">
+                    <strong>Preparation Mode</strong><br>
+                    Scan audio files for selected month and create fast-loading summary file (JSON)<br>
+                    <small>Do this once per month — or when new files are added</small>
+                </div>
+
+                <div class="date-controls" style="justify-content: center;">
                     <div class="date-group">
-                        <label for="preloadMonth">Select Month</label>
+                        <label for="preloadMonth">Month to prepare</label>
                         <input type="month" id="preloadMonth" class="date-input">
                     </div>
-                    <button id="startPreload" class="action-btn success">💾 Pre-load & Save Month</button>
-                    <button id="loadPreloadedData" class="action-btn">📊 Load Pre-loaded Data</button>
+
+                    <button id="startPreload" class="action-btn success"
+                        style="padding: 16px 48px; font-size: 1.15rem;">
+                        💾 Create / Update Monthly JSON
+                    </button>
                 </div>
-                <div class="preload-status" id="preloadStatus" style="display: none;">
-                    <h3>Pre-load Progress</h3>
+
+                <div class="preload-status" id="preloadStatus" style="display: none; margin-top: 30px;">
+                    <h3>Processing Status</h3>
                     <div class="status-item">
                         <span class="status-label">Status:</span>
                         <span class="status-value" id="preloadStatusText">-</span>
@@ -421,368 +494,368 @@
                     </div>
                 </div>
             </div>
+
+
+            <div class="loading" id="loading">🔍 Loading data...</div>
+            <div class="error" id="error"></div>
+            <div class="success" id="success"></div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalUsers">0</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalFiles">0</div>
+                    <div class="stat-label">Total Files</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalDuration">0h</div>
+                    <div class="stat-label">Total Duration</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avgDuration">0m</div>
+                    <div class="stat-label">Avg per User</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title">User Audio Duration Analysis</div>
+                <div class="chart-wrapper">
+                    <canvas id="durationChart"></canvas>
+                </div>
+            </div>
+
+            <div class="user-list" id="userList"></div>
         </div>
 
-        <div class="loading" id="loading">🔍 Loading data...</div>
-        <div class="error" id="error"></div>
-        <div class="success" id="success"></div>
+        <script>
+            const API_CONFIG = {
+                baseUrl: 'https://blike2u2ckpj53v6wyklakq7ca0izxmp.lambda-url.us-east-1.on.aws'
+            };
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number" id="totalUsers">0</div>
-                <div class="stat-label">Active Users</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="totalFiles">0</div>
-                <div class="stat-label">Total Files</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="totalDuration">0h</div>
-                <div class="stat-label">Total Duration</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="avgDuration">0m</div>
-                <div class="stat-label">Avg per User</div>
-            </div>
-        </div>
+            let chartInstance = null;
+            let currentHospital = '';
+            let currentMode = 'view';
 
-        <div class="chart-container">
-            <div class="chart-title">User Audio Duration Analysis</div>
-            <div class="chart-wrapper">
-                <canvas id="durationChart"></canvas>
-            </div>
-        </div>
-
-        <div class="user-list" id="userList"></div>
-    </div>
-
-    <script>
-        const API_CONFIG = {
-            baseUrl: 'https://blike2u2ckpj53v6wyklakq7ca0izxmp.lambda-url.us-east-1.on.aws'
-        };
-
-        let chartInstance = null;
-        let currentHospital = '';
-        let currentMode = 'view';
-
-        async function apiRequest(action, options = {}) {
-            const body = { action, ...options };
-            const response = await fetch(API_CONFIG.baseUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`API Error: ${response.status} - ${errorText}`);
-            }
-
-            return response.json();
-        }
-
-        function switchMode(mode) {
-            currentMode = mode;
-            
-            document.getElementById('viewModeBtn').classList.toggle('active', mode === 'view');
-            document.getElementById('preloadModeBtn').classList.toggle('active', mode === 'preload');
-            
-            document.getElementById('viewModeControls').style.display = mode === 'view' ? 'block' : 'none';
-            document.getElementById('preloadModeControls').style.display = mode === 'preload' ? 'block' : 'none';
-            
-            clearMessages();
-            clearDisplayData();
-        }
-
-        function clearMessages() {
-            document.getElementById('error').classList.remove('active');
-            document.getElementById('success').classList.remove('active');
-        }
-
-        function clearDisplayData() {
-            document.getElementById('totalUsers').textContent = '0';
-            document.getElementById('totalFiles').textContent = '0';
-            document.getElementById('totalDuration').textContent = '0h';
-            document.getElementById('avgDuration').textContent = '0m';
-            document.getElementById('userList').innerHTML = '';
-            
-            if (chartInstance) {
-                chartInstance.destroy();
-                chartInstance = null;
-            }
-        }
-
-        function showLoading(show) {
-            document.getElementById('loading').classList.toggle('active', show);
-        }
-
-        function showError(message) {
-            const errorEl = document.getElementById('error');
-            errorEl.textContent = message;
-            errorEl.classList.add('active');
-        }
-
-        function showSuccess(message) {
-            const successEl = document.getElementById('success');
-            successEl.textContent = message;
-            successEl.classList.add('active');
-        }
-
-        // PRE-LOAD MODE: Load and save monthly data
-        async function preloadMonthlyData() {
-            if (!currentHospital) {
-                showError('Please select a hospital first');
-                return;
-            }
-
-            const monthInput = document.getElementById('preloadMonth').value;
-            if (!monthInput) {
-                showError('Please select a month');
-                return;
-            }
-
-            const [year, month] = monthInput.split('-');
-
-            showLoading(true);
-            clearMessages();
-            
-            const statusPanel = document.getElementById('preloadStatus');
-            statusPanel.style.display = 'block';
-            document.getElementById('preloadStatusText').textContent = 'Loading...';
-            document.getElementById('preloadFilesCount').textContent = '0';
-            document.getElementById('preloadUsersCount').textContent = '0';
-
-            try {
-                console.log('Pre-loading data for:', { hospital: currentHospital, month: monthInput, year: parseInt(year), monthNum: parseInt(month) });
-                
-                const response = await apiRequest('preload-monthly-data', {
-                    hospital: currentHospital,
-                    year: parseInt(year),
-                    month: parseInt(month) // Send month as-is (1-12)
+            async function apiRequest(action, options = {}) {
+                const body = { action, ...options };
+                const response = await fetch(API_CONFIG.baseUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
                 });
 
-                document.getElementById('preloadStatusText').textContent = 'Completed';
-                document.getElementById('preloadFilesCount').textContent = response.totalFiles || 0;
-                document.getElementById('preloadUsersCount').textContent = response.totalUsers || 0;
-
-                showSuccess(`✅ Successfully pre-loaded and saved data for ${monthInput}: ${response.totalFiles} files, ${response.totalUsers} users`);
-                
-            } catch (err) {
-                console.error('Pre-load error:', err);
-                showError(`Failed to pre-load data: ${err.message}`);
-                document.getElementById('preloadStatusText').textContent = 'Failed';
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        // LOAD PRE-LOADED DATA: Load the pre-loaded data for viewing in pre-load mode
-        async function loadPreloadedData() {
-            if (!currentHospital) {
-                showError('Please select a hospital first');
-                return;
-            }
-
-            const monthInput = document.getElementById('preloadMonth').value;
-            if (!monthInput) {
-                showError('Please select a month');
-                return;
-            }
-
-            const [year, month] = monthInput.split('-');
-            // Create proper date range for the entire month
-            const startDate = new Date(parseInt(year), parseInt(month) - 1, 1); // month - 1 because JS uses 0-based months
-            const endDate = new Date(parseInt(year), parseInt(month), 0, 23, 59, 59, 999); // Day 0 of next month = last day of current month
-
-            showLoading(true);
-            clearMessages();
-            clearDisplayData();
-
-            try {
-                console.log('Loading pre-loaded data for:', { 
-                    hospital: currentHospital, 
-                    month: monthInput,
-                    startDate: startDate.toISOString(),
-                    endDate: endDate.toISOString()
-                });
-
-                const response = await apiRequest('view-aggregated-data', {
-                    hospital: currentHospital,
-                    startDate: startDate.toISOString(),
-                    endDate: endDate.toISOString()
-                });
-
-                if (response.files && response.files.length > 0) {
-                    processAndDisplayData(response.files);
-                    showSuccess(`✅ Loaded ${response.files.length} files from pre-loaded data for ${monthInput}`);
-                } else {
-                    showError('No pre-loaded data found for this month. Please pre-load it first using the "Pre-load & Save Month" button.');
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`API Error: ${response.status} - ${errorText}`);
                 }
 
-            } catch (err) {
-                console.error('Load pre-loaded data error:', err);
-                showError(`Failed to load pre-loaded data: ${err.message}`);
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        // VIEW MODE: Load pre-aggregated data
-        async function loadViewData() {
-            if (!currentHospital) {
-                showError('Please select a hospital first');
-                return;
+                return response.json();
             }
 
-            const startDate = document.getElementById('viewStartDate').value;
-            const endDate = document.getElementById('viewEndDate').value;
+            function switchMode(mode) {
+                currentMode = mode;
 
-            if (!startDate || !endDate) {
-                showError('Please select both start and end dates');
-                return;
+                document.getElementById('viewModeBtn').classList.toggle('active', mode === 'view');
+                document.getElementById('preloadModeBtn').classList.toggle('active', mode === 'preload');
+
+                document.getElementById('viewModeControls').style.display = mode === 'view' ? 'block' : 'none';
+                document.getElementById('preloadModeControls').style.display = mode === 'preload' ? 'block' : 'none';
+
+                clearMessages();
+                clearDisplayData();
             }
 
-            const username = document.getElementById('viewUsername').value.trim() || null;
+            function clearMessages() {
+                document.getElementById('error').classList.remove('active');
+                document.getElementById('success').classList.remove('active');
+            }
 
-            showLoading(true);
-            clearMessages();
-            clearDisplayData();
+            function clearDisplayData() {
+                document.getElementById('totalUsers').textContent = '0';
+                document.getElementById('totalFiles').textContent = '0';
+                document.getElementById('totalDuration').textContent = '0h';
+                document.getElementById('avgDuration').textContent = '0m';
+                document.getElementById('userList').innerHTML = '';
 
-            try {
-                console.log('Loading view data:', { hospital: currentHospital, startDate, endDate, username });
+                if (chartInstance) {
+                    chartInstance.destroy();
+                    chartInstance = null;
+                }
+            }
 
-                const response = await apiRequest('view-aggregated-data', {
-                    hospital: currentHospital,
-                    startDate,
-                    endDate,
-                    username
-                });
+            function showLoading(show) {
+                document.getElementById('loading').classList.toggle('active', show);
+            }
 
-                if (response.files && response.files.length > 0) {
-                    processAndDisplayData(response.files);
-                    showSuccess(`✅ Loaded ${response.files.length} files from pre-aggregated data`);
-                } else {
-                    showError('No data found for the selected period. Please pre-load the data first.');
+            function showError(message) {
+                const errorEl = document.getElementById('error');
+                errorEl.textContent = message;
+                errorEl.classList.add('active');
+            }
+
+            function showSuccess(message) {
+                const successEl = document.getElementById('success');
+                successEl.textContent = message;
+                successEl.classList.add('active');
+            }
+
+            // PRE-LOAD MODE: Load and save monthly data
+            async function preloadMonthlyData() {
+                if (!currentHospital) {
+                    showError('Please select a hospital first');
+                    return;
                 }
 
-            } catch (err) {
-                console.error('View data error:', err);
-                showError(`Failed to load data: ${err.message}`);
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        function processAndDisplayData(files) {
-            const userStats = {};
-
-            files.forEach(fileInfo => {
-                const username = fileInfo.username || 'Unknown';
-                if (!userStats[username]) {
-                    userStats[username] = { totalDuration: 0, fileCount: 0 };
+                const monthInput = document.getElementById('preloadMonth').value;
+                if (!monthInput) {
+                    showError('Please select a month');
+                    return;
                 }
-                userStats[username].totalDuration += fileInfo.duration || 0;
-                userStats[username].fileCount += 1;
-            });
 
-            const totalFiles = files.length;
-            const totalDuration = Object.values(userStats).reduce((sum, user) => sum + user.totalDuration, 0);
-            const userCount = Object.keys(userStats).length;
+                const [year, month] = monthInput.split('-');
 
-            updateStats(userStats, totalFiles, totalDuration);
-            updateChart(userStats);
-            createUserCards(userStats);
-        }
+                showLoading(true);
+                clearMessages();
 
-        function updateStats(userStats, totalFiles, totalDuration) {
-            const userCount = Object.keys(userStats).length;
-            const totalHours = Math.floor(totalDuration / 3600);
-            const totalMinutes = Math.floor((totalDuration % 3600) / 60);
-            const avgDurationPerUser = userCount > 0 ? totalDuration / userCount : 0;
-            const avgMinutes = Math.round(avgDurationPerUser / 60);
+                const statusPanel = document.getElementById('preloadStatus');
+                statusPanel.style.display = 'block';
+                document.getElementById('preloadStatusText').textContent = 'Loading...';
+                document.getElementById('preloadFilesCount').textContent = '0';
+                document.getElementById('preloadUsersCount').textContent = '0';
 
-            document.getElementById('totalUsers').textContent = userCount;
-            document.getElementById('totalFiles').textContent = totalFiles;
-            document.getElementById('totalDuration').textContent = totalHours > 0 ? `${totalHours}h ${totalMinutes}m` : `${totalMinutes}m`;
-            document.getElementById('avgDuration').textContent = `${avgMinutes}m`;
-        }
+                try {
+                    console.log('Pre-loading data for:', { hospital: currentHospital, month: monthInput, year: parseInt(year), monthNum: parseInt(month) });
 
-        function updateChart(userStats) {
-            const ctx = document.getElementById('durationChart').getContext('2d');
-            const users = Object.keys(userStats).sort((a, b) => userStats[b].totalDuration - userStats[a].totalDuration);
-            const durations = users.map(user => Math.round(userStats[user].totalDuration / 60));
-            const colors = users.map((_, i) => `hsla(${(i * 137.5) % 360}, 70%, 60%, 0.8)`);
+                    const response = await apiRequest('preload-monthly-data', {
+                        hospital: currentHospital,
+                        year: parseInt(year),
+                        month: parseInt(month) // Send month as-is (1-12)
+                    });
 
-            if (chartInstance) chartInstance.destroy();
+                    document.getElementById('preloadStatusText').textContent = 'Completed';
+                    document.getElementById('preloadFilesCount').textContent = response.totalFiles || 0;
+                    document.getElementById('preloadUsersCount').textContent = response.totalUsers || 0;
 
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: users,
-                    datasets: [{
-                        label: 'Duration (minutes)',
-                        data: durations,
-                        backgroundColor: colors,
-                        borderColor: colors.map(c => c.replace('0.8', '1')),
-                        borderWidth: 2,
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, title: { display: true, text: 'Duration (minutes)' } },
-                        x: { title: { display: true, text: 'Users' } }
+                    showSuccess(`✅ Successfully pre-loaded and saved data for ${monthInput}: ${response.totalFiles} files, ${response.totalUsers} users`);
+
+                } catch (err) {
+                    console.error('Pre-load error:', err);
+                    showError(`Failed to pre-load data: ${err.message}`);
+                    document.getElementById('preloadStatusText').textContent = 'Failed';
+                } finally {
+                    showLoading(false);
+                }
+            }
+
+            // LOAD PRE-LOADED DATA: Load the pre-loaded data for viewing in pre-load mode
+            async function loadPreloadedData() {
+                if (!currentHospital) {
+                    showError('Please select a hospital first');
+                    return;
+                }
+
+                const monthInput = document.getElementById('preloadMonth').value;
+                if (!monthInput) {
+                    showError('Please select a month');
+                    return;
+                }
+
+                const [year, month] = monthInput.split('-');
+                // Create proper date range for the entire month
+                const startDate = new Date(parseInt(year), parseInt(month) - 1, 1); // month - 1 because JS uses 0-based months
+                const endDate = new Date(parseInt(year), parseInt(month), 0, 23, 59, 59, 999); // Day 0 of next month = last day of current month
+
+                showLoading(true);
+                clearMessages();
+                clearDisplayData();
+
+                try {
+                    console.log('Loading pre-loaded data for:', {
+                        hospital: currentHospital,
+                        month: monthInput,
+                        startDate: startDate.toISOString(),
+                        endDate: endDate.toISOString()
+                    });
+
+                    const response = await apiRequest('view-aggregated-data', {
+                        hospital: currentHospital,
+                        startDate: startDate.toISOString(),
+                        endDate: endDate.toISOString()
+                    });
+
+                    if (response.files && response.files.length > 0) {
+                        processAndDisplayData(response.files);
+                        showSuccess(`✅ Loaded ${response.files.length} files from pre-loaded data for ${monthInput}`);
+                    } else {
+                        showError('No pre-loaded data found for this month. Please pre-load it first using the "Pre-load & Save Month" button.');
                     }
+
+                } catch (err) {
+                    console.error('Load pre-loaded data error:', err);
+                    showError(`Failed to load pre-loaded data: ${err.message}`);
+                } finally {
+                    showLoading(false);
                 }
-            });
-        }
+            }
 
-        function createUserCards(userStats) {
-            const userList = document.getElementById('userList');
-            userList.innerHTML = '';
+            // VIEW MODE: Load pre-aggregated data
+            async function loadViewData() {
+                if (!currentHospital) {
+                    showError('Please select a hospital first');
+                    return;
+                }
 
-            Object.entries(userStats).sort((a, b) => b[1].totalDuration - a[1].totalDuration).forEach(([username, stats]) => {
-                const durationMinutes = Math.round(stats.totalDuration / 60);
-                const durationHours = Math.floor(durationMinutes / 60);
-                const remainingMinutes = durationMinutes % 60;
-                const displayDuration = durationHours > 0 ? `${durationHours}h ${remainingMinutes}m` : `${durationMinutes}m`;
+                const startDate = document.getElementById('viewStartDate').value;
+                const endDate = document.getElementById('viewEndDate').value;
 
-                const card = document.createElement('div');
-                card.className = 'user-card';
-                card.innerHTML = `
+                if (!startDate || !endDate) {
+                    showError('Please select both start and end dates');
+                    return;
+                }
+
+                const username = document.getElementById('viewUsername').value.trim() || null;
+
+                showLoading(true);
+                clearMessages();
+                clearDisplayData();
+
+                try {
+                    console.log('Loading view data:', { hospital: currentHospital, startDate, endDate, username });
+
+                    const response = await apiRequest('view-aggregated-data', {
+                        hospital: currentHospital,
+                        startDate,
+                        endDate,
+                        username
+                    });
+
+                    if (response.files && response.files.length > 0) {
+                        processAndDisplayData(response.files);
+                        showSuccess(`✅ Loaded ${response.files.length} files from pre-aggregated data`);
+                    } else {
+                        showError('No data found for the selected period. Please pre-load the data first.');
+                    }
+
+                } catch (err) {
+                    console.error('View data error:', err);
+                    showError(`Failed to load data: ${err.message}`);
+                } finally {
+                    showLoading(false);
+                }
+            }
+
+            function processAndDisplayData(files) {
+                const userStats = {};
+
+                files.forEach(fileInfo => {
+                    const username = fileInfo.username || 'Unknown';
+                    if (!userStats[username]) {
+                        userStats[username] = { totalDuration: 0, fileCount: 0 };
+                    }
+                    userStats[username].totalDuration += fileInfo.duration || 0;
+                    userStats[username].fileCount += 1;
+                });
+
+                const totalFiles = files.length;
+                const totalDuration = Object.values(userStats).reduce((sum, user) => sum + user.totalDuration, 0);
+                const userCount = Object.keys(userStats).length;
+
+                updateStats(userStats, totalFiles, totalDuration);
+                updateChart(userStats);
+                createUserCards(userStats);
+            }
+
+            function updateStats(userStats, totalFiles, totalDuration) {
+                const userCount = Object.keys(userStats).length;
+                const totalHours = Math.floor(totalDuration / 3600);
+                const totalMinutes = Math.floor((totalDuration % 3600) / 60);
+                const avgDurationPerUser = userCount > 0 ? totalDuration / userCount : 0;
+                const avgMinutes = Math.round(avgDurationPerUser / 60);
+
+                document.getElementById('totalUsers').textContent = userCount;
+                document.getElementById('totalFiles').textContent = totalFiles;
+                document.getElementById('totalDuration').textContent = totalHours > 0 ? `${totalHours}h ${totalMinutes}m` : `${totalMinutes}m`;
+                document.getElementById('avgDuration').textContent = `${avgMinutes}m`;
+            }
+
+            function updateChart(userStats) {
+                const ctx = document.getElementById('durationChart').getContext('2d');
+                const users = Object.keys(userStats).sort((a, b) => userStats[b].totalDuration - userStats[a].totalDuration);
+                const durations = users.map(user => Math.round(userStats[user].totalDuration / 60));
+                const colors = users.map((_, i) => `hsla(${(i * 137.5) % 360}, 70%, 60%, 0.8)`);
+
+                if (chartInstance) chartInstance.destroy();
+
+                chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: users,
+                        datasets: [{
+                            label: 'Duration (minutes)',
+                            data: durations,
+                            backgroundColor: colors,
+                            borderColor: colors.map(c => c.replace('0.8', '1')),
+                            borderWidth: 2,
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, title: { display: true, text: 'Duration (minutes)' } },
+                            x: { title: { display: true, text: 'Users' } }
+                        }
+                    }
+                });
+            }
+
+            function createUserCards(userStats) {
+                const userList = document.getElementById('userList');
+                userList.innerHTML = '';
+
+                Object.entries(userStats).sort((a, b) => b[1].totalDuration - a[1].totalDuration).forEach(([username, stats]) => {
+                    const durationMinutes = Math.round(stats.totalDuration / 60);
+                    const durationHours = Math.floor(durationMinutes / 60);
+                    const remainingMinutes = durationMinutes % 60;
+                    const displayDuration = durationHours > 0 ? `${durationHours}h ${remainingMinutes}m` : `${durationMinutes}m`;
+
+                    const card = document.createElement('div');
+                    card.className = 'user-card';
+                    card.innerHTML = `
                     <div class="user-name">${username}</div>
                     <div class="user-stats">
                         <div class="duration">${displayDuration}</div>
                         <div class="file-count">${stats.fileCount} files</div>
                     </div>
                 `;
-                userList.appendChild(card);
+                    userList.appendChild(card);
+                });
+            }
+
+            // Event listeners
+            document.getElementById('hospitalSelect').addEventListener('change', function () {
+                currentHospital = this.value;
+                clearDisplayData();
+                clearMessages();
             });
-        }
 
-        // Event listeners
-        document.getElementById('hospitalSelect').addEventListener('change', function() {
-            currentHospital = this.value;
-            clearDisplayData();
-            clearMessages();
-        });
+            document.getElementById('startPreload').addEventListener('click', preloadMonthlyData);
+            document.getElementById('loadViewData').addEventListener('click', loadViewData);
 
-        document.getElementById('startPreload').addEventListener('click', preloadMonthlyData);
-        document.getElementById('loadPreloadedData').addEventListener('click', loadPreloadedData);
-        document.getElementById('loadViewData').addEventListener('click', loadViewData);
+            // Initialize dates
+            const today = new Date();
+            document.getElementById('viewEndDate').value = today.toISOString().split('T')[0];
+            const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            document.getElementById('viewStartDate').value = oneWeekAgo.toISOString().split('T')[0];
+            document.getElementById('preloadMonth').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
 
-        // Initialize dates
-        const today = new Date();
-        document.getElementById('viewEndDate').value = today.toISOString().split('T')[0];
-        const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-        document.getElementById('viewStartDate').value = oneWeekAgo.toISOString().split('T')[0];
-        document.getElementById('preloadMonth').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
-
-        // Show view mode by default
-        switchMode('view');
-    </script>
+            // Show view mode by default
+            switchMode('view');
+        </script>
 </body>
+
 </html>
