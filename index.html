@@ -537,6 +537,15 @@
             
             <div class="date-controls">
                 <div class="date-group">
+                    <label for="modeSelect">Mode</label>
+                    <div class="select-wrapper">
+                        <select id="modeSelect" class="hospital-dropdown">
+                            <option value="view">View Data</option>
+                            <option value="preload">Preload Data</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="date-group">
                     <label for="startDate">Start Date</label>
                     <input type="date" id="startDate" class="date-input">
                 </div>
@@ -544,7 +553,7 @@
                     <label for="endDate">End Date</label>
                     <input type="date" id="endDate" class="date-input">
                 </div>
-                <div class="date-group">
+                <div class="date-group view-only">
                     <label for="usernameMode">User Selection</label>
                     <div class="select-wrapper">
                         <select id="usernameMode" class="hospital-dropdown">
@@ -554,15 +563,15 @@
                         </select>
                     </div>
                 </div>
-                <div class="date-group" id="singleUserGroup">
+                <div class="date-group view-only" id="singleUserGroup">
                     <label for="usernameFilter">Username</label>
                     <input type="text" id="usernameFilter" class="date-input" placeholder="e.g. Anush76cardio">
                 </div>
-                <div class="date-group" id="multipleUserGroup" style="display: none;">
+                <div class="date-group view-only" id="multipleUserGroup" style="display: none;">
                     <label for="usernamesList">Usernames (one per line)</label>
                     <textarea id="usernamesList" class="usernames-textarea" placeholder="Anush76cardio&#10;John&#10;doctor123&#10;cardiologist99" rows="4"></textarea>
                 </div>
-                <div class="date-group" id="processingModeGroup" style="display: none;">
+                <div class="date-group view-only" id="processingModeGroup" style="display: none;">
                     <label for="processingMode">Processing Mode</label>
                     <div class="select-wrapper">
                         <select id="processingMode" class="hospital-dropdown">
@@ -690,7 +699,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
             });
-            
+
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
@@ -751,9 +760,23 @@
             document.getElementById('startDate').value = oneWeekAgo.toISOString().split('T')[0];
         }
         
-        // Handle username mode changes
-        document.getElementById('usernameMode').addEventListener('change', function() {
+        // Handle mode changes
+        document.getElementById('modeSelect').addEventListener('change', function() {
             const mode = this.value;
+            const viewOnlyElements = document.querySelectorAll('.view-only');
+            viewOnlyElements.forEach(el => {
+                el.style.display = mode === 'view' ? 'flex' : 'none';
+            });
+            document.getElementById('refreshData').textContent = mode === 'preload' ? '🚀 Preload Data' : '🚀 Load All Data';
+            document.getElementById('usernameMode').dispatchEvent(new Event('change'));
+        });
+        
+        // Handle username mode changes (view mode only)
+        document.getElementById('usernameMode').addEventListener('change', function() {
+            const mode = document.getElementById('modeSelect').value;
+            if (mode !== 'view') return;
+            
+            const usernameMode = this.value;
             const singleGroup = document.getElementById('singleUserGroup');
             const multipleGroup = document.getElementById('multipleUserGroup');
             const processingGroup = document.getElementById('processingModeGroup');
@@ -764,7 +787,7 @@
             processingGroup.style.display = 'none';
             
             // Show relevant groups based on mode
-            switch (mode) {
+            switch (usernameMode) {
                 case 'single':
                     singleGroup.style.display = 'flex';
                     break;
@@ -779,7 +802,7 @@
         });
         
         // AUTO-BATCHING: Automatically load all batches until complete
-        async function loadAllDataWithAutoBatching(startDate, endDate, hospitalFolder) {
+        async function loadAllDataWithAutoBatching(startDate, endDate, hospitalFolder, action) {
             const loading = document.getElementById('loading');
             const error = document.getElementById('error');
             const processingInfo = document.getElementById('processingInfo');
@@ -806,7 +829,7 @@
             
             try {
                 const usernameMode = document.getElementById('usernameMode').value;
-                console.log('🚀 Starting auto-batching process:', { hospitalFolder, startDate, endDate, usernameMode });
+                console.log('🚀 Starting auto-batching process:', { hospitalFolder, startDate, endDate, usernameMode, action });
                 
                 while (hasMoreBatches && isLoadingBatches) {
                     console.log(`📦 Loading batch ${currentBatch}...`);
@@ -816,20 +839,27 @@
                     
                     let response;
                     
-                    // Choose the appropriate API call based on mode
-                    switch (usernameMode) {
-                        case 'single':
-                            response = await fetchSingleUserBatch(hospitalFolder, startDate, endDate, currentBatch);
-                            break;
-                        case 'multiple':
-                            response = await fetchMultipleUsersBatch(hospitalFolder, startDate, endDate, currentBatch);
-                            break;
-                        case 'all':
-                            response = await fetchAllUsersBatch(hospitalFolder, startDate, endDate, currentBatch);
-                            break;
-                        default:
-                            throw new Error('Invalid username mode');
-                    }
+                    // Choose the appropriate API call based on mode and action
+                    const options = {
+                        hospital: hospitalFolder,
+                        startDate: startDate.toISOString(),
+                        endDate: endDate.toISOString(),
+                        batchNumber: currentBatch
+                    };
+                    
+                    if (action === 'view-preloaded') {
+                        options.usernameMode = usernameMode;
+                        if (usernameMode === 'single') {
+                            options.username = document.getElementById('usernameFilter').value.trim();
+                        } else if (usernameMode === 'multiple') {
+                            const usernamesText = document.getElementById('usernamesList').value.trim();
+                            options.usernames = usernamesText.split('\n').map(u => u.trim()).filter(u => u.length > 0);
+                            options.processingMode = document.getElementById('processingMode').value;
+                        }
+                        // for 'all', no additional options
+                    } // for preload-months, no username options
+                    
+                    response = await apiRequest(action, options);
                     
                     console.log(`📦 Batch ${currentBatch} response:`, response);
                     
@@ -858,7 +888,7 @@
                         hasMoreBatches ? `Loaded batch ${currentBatch} of ${totalBatches}` : 'All batches loaded!', progressPercentage);
                     
                     // Show processing stats from the latest batch
-                    showProcessingStats(response, usernameMode, currentBatch, totalBatches);
+                    showProcessingStats(response, usernameMode, currentBatch, totalBatches, action);
                     
                     // Update UI with accumulated data after each batch
                     updateUIWithAccumulatedData();
@@ -904,7 +934,7 @@
             } finally {
                 loading.classList.remove('active');
                 refreshButton.disabled = false;
-                refreshButton.textContent = '🚀 Load All Data';
+                refreshButton.textContent = document.getElementById('modeSelect').value === 'preload' ? '🚀 Preload Data' : '🚀 Load All Data';
                 isLoadingBatches = false;
             }
         }
@@ -929,8 +959,7 @@
                 allUserStats[username].files.push({
                     filename: fileInfo.filename,
                     duration: duration,
-                    date: fileDate,
-                    presignedUrl: fileInfo.presignedUrl
+                    date: fileDate
                 });
             }
         }
@@ -966,74 +995,16 @@
             createUserCards(allUserStats);
         }
         
-        // Fetch single user batch
-        async function fetchSingleUserBatch(hospitalFolder, startDate, endDate, batchNumber) {
-            const username = document.getElementById('usernameFilter').value.trim();
-            
-            if (!username) {
-                throw new Error('Username is required for single user mode');
-            }
-            
-            return await apiRequest('audio-list', {
-                hospital: hospitalFolder,
-                startDate: startDate.toISOString(),
-                endDate: endDate.toISOString(),
-                username: username,
-                batchNumber: batchNumber,
-                maxFilesPerBatch: 100
-            });
-        }
-        
-        // Fetch multiple users batch
-        async function fetchMultipleUsersBatch(hospitalFolder, startDate, endDate, batchNumber) {
-            const usernamesText = document.getElementById('usernamesList').value.trim();
-            const processingMode = document.getElementById('processingMode').value;
-            
-            if (!usernamesText) {
-                throw new Error('Please enter at least one username');
-            }
-            
-            // Parse usernames (one per line, filter empty lines)
-            const usernames = usernamesText.split('\n')
-                .map(u => u.trim())
-                .filter(u => u.length > 0);
-            
-            if (usernames.length === 0) {
-                throw new Error('No valid usernames found');
-            }
-            
-            return await apiRequest('audio-list-multi-user', {
-                hospital: hospitalFolder,
-                startDate: startDate.toISOString(),
-                endDate: endDate.toISOString(),
-                usernames: usernames,
-                processingMode: processingMode,
-                maxConcurrentUsers: 5,
-                includeProgressDetails: true,
-                batchNumber: batchNumber,
-                maxFilesPerBatch: 100
-            });
-        }
-        
-        // Fetch all users batch
-        async function fetchAllUsersBatch(hospitalFolder, startDate, endDate, batchNumber) {
-            return await apiRequest('audio-list', {
-                hospital: hospitalFolder,
-                startDate: startDate.toISOString(),
-                endDate: endDate.toISOString(),
-                batchNumber: batchNumber,
-                maxFilesPerBatch: 100
-                // No username = all users
-            });
-        }
-        
         // Show processing statistics
-        function showProcessingStats(response, usernameMode, currentBatch, totalBatches) {
+        function showProcessingStats(response, usernameMode, currentBatch, totalBatches, action) {
             const processingInfo = document.getElementById('processingInfo');
             let optimizationText;
             let cssClass;
             
-            if (usernameMode === 'multiple' && response.multiUserStats) {
+            if (action === 'preload-months') {
+                optimizationText = `🔄 PRELOAD: Processed ${response.preloadStats.monthsProcessed} months | Saved ${response.preloadStats.totalFilesSaved} files`;
+                cssClass = 'processing-info optimized';
+            } else if (usernameMode === 'multiple' && response.multiUserStats) {
                 const stats = response.multiUserStats;
                 const efficiency = parseInt(stats.efficiency);
                 
@@ -1175,7 +1146,7 @@
                 const card = document.createElement('div');
                 card.className = 'user-card';
                 
-                const durationMinutes = Math.round(stats.totalDuration / 60);
+                                const durationMinutes = Math.round(stats.totalDuration / 60);
                 const durationHours = Math.floor(durationMinutes / 60);
                 const remainingMinutes = durationMinutes % 60;
                 
@@ -1195,7 +1166,7 @@
             });
         }
         
-        // Main refresh function with auto-batching
+        // Main refresh function with mode support
         async function refreshData() {
             if (!currentHospital) {
                 alert('Please select a hospital first');
@@ -1204,6 +1175,7 @@
             
             const startDateStr = document.getElementById('startDate').value;
             const endDateStr = document.getElementById('endDate').value;
+            const mode = document.getElementById('modeSelect').value;
             
             if (!startDateStr || !endDateStr) {
                 alert('Please select both start and end dates');
@@ -1219,13 +1191,20 @@
             const endDate = new Date(endDateStr);
             endDate.setHours(23, 59, 59, 999);
             
-            console.log('🚀 Starting auto-batching data load:', { currentHospital, startDate, endDate });
+            console.log('Starting data operation:', { mode, currentHospital, startDate, endDate });
             
             // Clear previous data
             clearDisplayData();
             
+            let action;
+            if (mode === 'preload') {
+                action = 'preload-months';
+            } else { // view
+                action = 'view-preloaded';
+            }
+            
             // Start auto-batching process
-            await loadAllDataWithAutoBatching(startDate, endDate, currentHospital);
+            await loadAllDataWithAutoBatching(startDate, endDate, currentHospital, action);
         }
         
         // Event listeners
@@ -1260,7 +1239,7 @@
             }
         }
         
-        // Add Hospital Modal functionality
+        // Add Hospital Modal functionality (unchanged)
         document.getElementById('addHospitalBtn').addEventListener('click', function() {
             document.getElementById('addHospitalModal').classList.add('active');
             document.getElementById('hospitalNameInput').focus();
@@ -1282,7 +1261,6 @@
             }
         });
         
-        // Close modal when clicking outside
         document.getElementById('addHospitalModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 this.classList.remove('active');
@@ -1290,7 +1268,6 @@
             }
         });
         
-        // Enter key support for modal
         document.getElementById('hospitalNameInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 document.getElementById('confirmAddHospital').click();
@@ -1302,7 +1279,8 @@
         initializeDates();
         updateHospitalInfo();
         
-        // Initialize username mode (trigger change event to set up initial state)
+        // Trigger initial mode and username mode setup
+        document.getElementById('modeSelect').dispatchEvent(new Event('change'));
         document.getElementById('usernameMode').dispatchEvent(new Event('change'));
     </script>
 </body>
