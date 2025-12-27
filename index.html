@@ -81,21 +81,13 @@
         }
 
         .controls-panel {
-            display: block !important;
-            min-height: 200px !important;
-            /* force enough space */
-            overflow: visible !important;
-            /* prevent clipping */
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-
-        .controls-panel #preloadModeControls,
-        .controls-panel #viewModeControls {
-            display: block !important;
-            /* extra safety */
-            min-height: 150px;
-            /* helps flex containers expand */
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .hospital-controls {
@@ -303,14 +295,18 @@
             border-color: #c33;
         }
 
-        .success {
+        .success-message {
             background: #efe;
             color: #3c3;
             border-color: #3c3;
+            display: none;
         }
 
-        .error.active,
-        .success.active {
+        .success-message.active {
+            display: block;
+        }
+
+        .error.active{
             display: block;
         }
 
@@ -515,7 +511,8 @@
 
             <div class="loading" id="loading">🔍 Loading data...</div>
             <div class="error" id="error"></div>
-            <div class="success" id="success"></div>
+            <div class="success-message" id="success"></div>
+
 
             <div class="stats-grid">
                 <div class="stat-card">
