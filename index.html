@@ -393,11 +393,15 @@
             font-weight: 600;
         }
 
-        #viewModeControls {
+        /* #viewModeControls {
             display: none;
         }
 
         #preloadModeControls {
+            display: none;
+        } */
+
+        .mode-controls.hidden {
             display: none;
         }
     </style>
@@ -437,7 +441,7 @@
             </div>
 
             <!-- VIEW MODE CONTROLS -->
-            <div id="viewModeControls">
+            <div id="viewModeControls" class="mode-controls hidden">
                 <div class="date-controls">
                     <div class="date-group">
                         <label for="viewStartDate">Start Date</label>
@@ -458,7 +462,7 @@
             <!-- PRE-LOAD MODE CONTROLS -->
             <!-- Replace the whole #preloadModeControls content with this -->
 
-            <div id="preloadModeControls" style="display: none;">
+            <div id="preloadModeControls" class="mode-controls hidden">
                 <div style="text-align: center; margin: 25px 0; padding: 0 20px;">
                     <h3 style="color: #444; margin-bottom: 12px;">Preparation Mode</h3>
                     <p
@@ -563,25 +567,17 @@
                 console.log(`Switching to mode: ${mode}`);
                 currentMode = mode;
 
-                // Safety fallback: make sure clicking the mode buttons works
-                document.getElementById('viewModeBtn')?.addEventListener('click', () => switchMode('view'));
-                document.getElementById('preloadModeBtn')?.addEventListener('click', () => switchMode('preload'));
+                document.getElementById('viewModeBtn').classList.toggle('active', mode === 'view');
+                document.getElementById('preloadModeBtn').classList.toggle('active', mode === 'preload');
 
-                const viewEl = document.getElementById('viewModeControls');
-                const preloadEl = document.getElementById('preloadModeControls');
-
-                if (viewEl) viewEl.style.display = mode === 'view' ? 'block' : 'none';
-                if (preloadEl) {
-                    preloadEl.style.display = mode === 'preload' ? 'block' : 'none';
-                    console.log(`Preload controls now: ${preloadEl.style.display}`);
-                } else {
-                    console.error("Preload controls element not found!");
-                }
+                document.getElementById('viewModeControls').classList.toggle('hidden', mode !== 'view');
+                document.getElementById('preloadModeControls').classList.toggle('hidden', mode !== 'preload');
 
                 clearMessages();
                 clearDisplayData();
             }
 
+            
             function clearMessages() {
                 document.getElementById('error').classList.remove('active');
                 document.getElementById('success').classList.remove('active');
