@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Monitoring Dashboard</title>
+    <title>Audio Monitoring Dashboard - Dual Mode</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         * {
@@ -36,6 +36,38 @@
         .header p {
             font-size: 1.2rem;
             opacity: 0.9;
+        }
+        .mode-selector {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+        .mode-btn {
+            padding: 15px 30px;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            color: #667eea;
+        }
+        .mode-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: scale(1.05);
+        }
+        .mode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
         .controls-panel {
             background: rgba(255, 255, 255, 0.95);
@@ -95,22 +127,6 @@
             pointer-events: none;
             font-size: 0.8rem;
         }
-        .add-hospital-btn {
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #43a047, #66bb6a);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(67, 160, 71, 0.3);
-        }
-        .add-hospital-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(67, 160, 71, 0.4);
-        }
         .date-controls {
             display: flex;
             gap: 20px;
@@ -141,24 +157,7 @@
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
-        .usernames-textarea {
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: white;
-            resize: vertical;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .usernames-textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        .refresh-btn {
+        .action-btn {
             padding: 12px 24px;
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
@@ -170,97 +169,19 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
-        .refresh-btn:hover {
+        .action-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
-        .refresh-btn:active {
-            transform: translateY(0);
-        }
-        .refresh-btn:disabled {
+        .action-btn:disabled {
             background: #ccc;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
-        
-        /* Auto-batching progress styles */
-        .batch-progress {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            display: none;
-        }
-        .batch-progress.active {
-            display: block;
-        }
-        .batch-header {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .batch-status {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border-radius: 12px;
-            font-weight: 600;
-        }
-        .batch-bar-container {
-            background: #e0e0e0;
-            border-radius: 10px;
-            height: 20px;
-            margin-bottom: 15px;
-            overflow: hidden;
-        }
-        .batch-bar {
-            height: 100%;
+        .action-btn.success {
             background: linear-gradient(135deg, #43a047, #66bb6a);
-            border-radius: 10px;
-            transition: width 0.3s ease;
-            position: relative;
         }
-        .batch-bar.pulsing {
-            animation: pulse-loading 1.5s infinite;
-        }
-        @keyframes pulse-loading {
-            0% { opacity: 0.8; }
-            50% { opacity: 1; }
-            100% { opacity: 0.8; }
-        }
-        .batch-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        .batch-detail-item {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            border-left: 4px solid #667eea;
-        }
-        .batch-detail-number {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #667eea;
-        }
-        .batch-detail-label {
-            font-size: 0.9rem;
-            color: #666;
-        }
-        
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -321,134 +242,25 @@
         .loading.active {
             display: block;
         }
-        .error {
-            background: #fee;
-            color: #c33;
+        .error, .success {
             padding: 15px;
             border-radius: 8px;
             margin: 20px 0;
-            border-left: 4px solid #c33;
+            border-left: 4px solid;
             display: none;
         }
-        .error.active {
+        .error {
+            background: #fee;
+            color: #c33;
+            border-color: #c33;
+        }
+        .success {
+            background: #efe;
+            color: #3c3;
+            border-color: #3c3;
+        }
+        .error.active, .success.active {
             display: block;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
-        }
-        .modal.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-        }
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 20px;
-        }
-        .modal-input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 1rem;
-            margin-bottom: 20px;
-            box-sizing: border-box;
-        }
-        .modal-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        .modal-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-        }
-        .modal-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .modal-btn.primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-        }
-        .modal-btn.secondary {
-            background: #f5f5f5;
-            color: #333;
-        }
-        .modal-btn:hover {
-            transform: translateY(-2px);
-        }
-        .no-hospital-message {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-            font-size: 1.1rem;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            margin: 20px 0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        .hospital-info {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-        .processing-info {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #666;
-            border: 1px solid #e0e0e0;
-        }
-        .processing-info.optimized {
-            background: linear-gradient(135deg, #43a047, #66bb6a);
-            color: white;
-            border: none;
-        }
-        .processing-info.ultra-optimized {
-            background: linear-gradient(135deg, #ff6b35, #f7931e);
-            color: white;
-            border: none;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 107, 53, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0); }
         }
         .user-list {
             display: grid;
@@ -488,28 +300,46 @@
             font-size: 0.9rem;
             color: #666;
         }
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .hospital-controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .date-controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .chart-wrapper {
-                height: 300px;
-            }
-            
-            .batch-details {
-                grid-template-columns: 1fr;
-            }
+        .preload-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .preload-status {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+        .preload-status h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        .status-label {
+            font-weight: 600;
+            color: #555;
+        }
+        .status-value {
+            color: #667eea;
+            font-weight: 600;
+        }
+        #viewModeControls {
+            display: none;
+        }
+        #preloadModeControls {
+            display: none;
         }
     </style>
 </head>
@@ -517,8 +347,20 @@
     <div class="container">
         <div class="header">
             <h1>Audio Monitoring Dashboard</h1>
-            <p>Track user audio uploads with automatic batch loading</p>
+            <p>Pre-load monthly data or view saved aggregations</p>
         </div>
+
+        <!-- Mode Selector -->
+        <div class="mode-selector">
+            <button class="mode-btn active" id="viewModeBtn" onclick="switchMode('view')">
+                📊 View Mode
+            </button>
+            <button class="mode-btn" id="preloadModeBtn" onclick="switchMode('preload')">
+                💾 Pre-load Mode
+            </button>
+        </div>
+
+        <!-- Hospital Selection (shared) -->
         <div class="controls-panel">
             <div class="hospital-controls">
                 <div class="hospital-selector">
@@ -532,89 +374,58 @@
                         </select>
                     </div>
                 </div>
-                <button id="addHospitalBtn" class="add-hospital-btn">+ Add Hospital</button>
             </div>
-            
-            <div class="date-controls">
-                <div class="date-group">
-                    <label for="modeSelect">Mode</label>
-                    <div class="select-wrapper">
-                        <select id="modeSelect" class="hospital-dropdown">
-                            <option value="view">View Data</option>
-                            <option value="preload">Preload Data</option>
-                        </select>
+
+            <!-- VIEW MODE CONTROLS -->
+            <div id="viewModeControls">
+                <div class="date-controls">
+                    <div class="date-group">
+                        <label for="viewStartDate">Start Date</label>
+                        <input type="date" id="viewStartDate" class="date-input">
                     </div>
-                </div>
-                <div class="date-group">
-                    <label for="startDate">Start Date</label>
-                    <input type="date" id="startDate" class="date-input">
-                </div>
-                <div class="date-group">
-                    <label for="endDate">End Date</label>
-                    <input type="date" id="endDate" class="date-input">
-                </div>
-                <div class="date-group view-only">
-                    <label for="usernameMode">User Selection</label>
-                    <div class="select-wrapper">
-                        <select id="usernameMode" class="hospital-dropdown">
-                            <option value="single">Single User</option>
-                            <option value="multiple">Multiple Users (Ultra-Fast Each)</option>
-                            <option value="all">All Users</option>
-                        </select>
+                    <div class="date-group">
+                        <label for="viewEndDate">End Date</label>
+                        <input type="date" id="viewEndDate" class="date-input">
                     </div>
-                </div>
-                <div class="date-group view-only" id="singleUserGroup">
-                    <label for="usernameFilter">Username</label>
-                    <input type="text" id="usernameFilter" class="date-input" placeholder="e.g. Anush76cardio">
-                </div>
-                <div class="date-group view-only" id="multipleUserGroup" style="display: none;">
-                    <label for="usernamesList">Usernames (one per line)</label>
-                    <textarea id="usernamesList" class="usernames-textarea" placeholder="Anush76cardio&#10;John&#10;doctor123&#10;cardiologist99" rows="4"></textarea>
-                </div>
-                <div class="date-group view-only" id="processingModeGroup" style="display: none;">
-                    <label for="processingMode">Processing Mode</label>
-                    <div class="select-wrapper">
-                        <select id="processingMode" class="hospital-dropdown">
-                            <option value="progressive">📈 Progressive (Real-time Results)</option>
-                            <option value="parallel">⚡ Parallel (Fastest Overall)</option>
-                            <option value="sequential">🔄 Sequential (Simple)</option>
-                        </select>
+                    <div class="date-group">
+                        <label for="viewUsername">Username (optional)</label>
+                        <input type="text" id="viewUsername" class="date-input" placeholder="e.g. Anush76cardio">
                     </div>
+                    <button id="loadViewData" class="action-btn">📊 Load Data</button>
                 </div>
-                <button id="refreshData" class="refresh-btn">🚀 Load All Data</button>
             </div>
-        </div>
-        
-        <!-- Auto-Batching Progress Panel -->
-        <div class="batch-progress" id="batchProgress">
-            <div class="batch-header" id="batchHeader">🚀 Auto-Loading All Data Batches...</div>
-            <div class="batch-status">
-                <span id="batchStatusText">Loading batch 1...</span>
-                <span id="batchProgressText">0 / 0 files loaded</span>
-            </div>
-            <div class="batch-bar-container">
-                <div class="batch-bar pulsing" id="batchBar" style="width: 0%"></div>
-            </div>
-            <div class="batch-details">
-                <div class="batch-detail-item">
-                    <div class="batch-detail-number" id="currentBatchNum">1</div>
-                    <div class="batch-detail-label">Current Batch</div>
+
+            <!-- PRE-LOAD MODE CONTROLS -->
+            <div id="preloadModeControls">
+                <div class="date-controls">
+                    <div class="date-group">
+                        <label for="preloadMonth">Select Month</label>
+                        <input type="month" id="preloadMonth" class="date-input">
+                    </div>
+                    <button id="startPreload" class="action-btn success">💾 Pre-load & Save Month</button>
                 </div>
-                <div class="batch-detail-item">
-                    <div class="batch-detail-number" id="totalBatchesNum">-</div>
-                    <div class="batch-detail-label">Total Batches</div>
-                </div>
-                <div class="batch-detail-item">
-                    <div class="batch-detail-number" id="loadedFilesNum">0</div>
-                    <div class="batch-detail-label">Files Loaded</div>
-                </div>
-                <div class="batch-detail-item">
-                    <div class="batch-detail-number" id="totalFilesNum">-</div>
-                    <div class="batch-detail-label">Total Files</div>
+                <div class="preload-status" id="preloadStatus" style="display: none;">
+                    <h3>Pre-load Progress</h3>
+                    <div class="status-item">
+                        <span class="status-label">Status:</span>
+                        <span class="status-value" id="preloadStatusText">-</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Files Found:</span>
+                        <span class="status-value" id="preloadFilesCount">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Users Processed:</span>
+                        <span class="status-value" id="preloadUsersCount">0</span>
+                    </div>
                 </div>
             </div>
         </div>
-        
+
+        <div class="loading" id="loading">🔍 Loading data...</div>
+        <div class="error" id="error"></div>
+        <div class="success" id="success"></div>
+
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number" id="totalUsers">0</div>
@@ -633,67 +444,28 @@
                 <div class="stat-label">Avg per User</div>
             </div>
         </div>
-        
-        <div class="loading" id="loading">
-            <div>🔍 Initializing auto-batch data loading...</div>
-        </div>
-        <div class="error" id="error"></div>
-        <div id="hospitalInfo" class="hospital-info" style="display: none;"></div>
-        <div id="processingInfo" class="processing-info" style="display: none;"></div>
-        <div id="noHospitalMessage" class="no-hospital-message">
-            <h3>🏥 Select a Hospital</h3>
-            <p>Please select a hospital from the dropdown above to view audio monitoring data.</p>
-        </div>
-        
+
         <div class="chart-container">
             <div class="chart-title">User Audio Duration Analysis</div>
             <div class="chart-wrapper">
                 <canvas id="durationChart"></canvas>
             </div>
         </div>
+
         <div class="user-list" id="userList"></div>
     </div>
-    
-    <!-- Add Hospital Modal -->
-    <div id="addHospitalModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-title">Add New Hospital</div>
-            <input type="text" id="hospitalNameInput" class="modal-input" placeholder="Enter hospital name...">
-            <div class="modal-buttons">
-                <button id="confirmAddHospital" class="modal-btn primary">Add Hospital</button>
-                <button id="cancelAddHospital" class="modal-btn secondary">Cancel</button>
-            </div>
-        </div>
-    </div>
-    
+
     <script>
-        // Configuration - Update with your Lambda Function URL
         const API_CONFIG = {
             baseUrl: 'https://blike2u2ckpj53v6wyklakq7ca0izxmp.lambda-url.us-east-1.on.aws'
         };
-        
+
         let chartInstance = null;
         let currentHospital = '';
-        let isLoadingBatches = false;
-        let allAccumulatedFiles = []; // Store all files from all batches
-        let allUserStats = {}; // Accumulated user statistics
-        
-        // Hospital management
-        const hospitals = [
-            { value: 'Erebuni', name: 'Erebuni Hospital' },
-            { value: 'Onco', name: 'Onco Hospital' },
-            { value: 'Astghik', name: 'Astghik Hospital' },
-        ];
-        
-        // Simplified API helper function
+        let currentMode = 'view';
+
         async function apiRequest(action, options = {}) {
-            console.log('Making request:', { action, options });
-            
-            const body = {
-                action: action,
-                ...options
-            };
-            
+            const body = { action, ...options };
             const response = await fetch(API_CONFIG.baseUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -702,376 +474,197 @@
 
             if (!response.ok) {
                 const errorText = await response.text();
-                throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+                throw new Error(`API Error: ${response.status} - ${errorText}`);
             }
-            
+
             return response.json();
         }
-        
-        // Initialize hospitals dropdown
-        function initializeHospitals() {
-            const select = document.getElementById('hospitalSelect');
-            select.innerHTML = '<option value="">Choose Hospital...</option>';
+
+        function switchMode(mode) {
+            currentMode = mode;
             
-            hospitals.forEach(hospital => {
-                const option = document.createElement('option');
-                option.value = hospital.value;
-                option.textContent = hospital.name;
-                select.appendChild(option);
-            });
+            document.getElementById('viewModeBtn').classList.toggle('active', mode === 'view');
+            document.getElementById('preloadModeBtn').classList.toggle('active', mode === 'preload');
+            
+            document.getElementById('viewModeControls').style.display = mode === 'view' ? 'block' : 'none';
+            document.getElementById('preloadModeControls').style.display = mode === 'preload' ? 'block' : 'none';
+            
+            clearMessages();
+            clearDisplayData();
         }
-        
-        // Add new hospital
-        function addHospital(name) {
-            const folderName = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-            const hospital = { value: folderName, name: name };
-            
-            hospitals.push(hospital);
-            initializeHospitals();
-            
-            // Select the newly added hospital
-            document.getElementById('hospitalSelect').value = folderName;
-            currentHospital = folderName;
-            updateHospitalInfo();
+
+        function clearMessages() {
+            document.getElementById('error').classList.remove('active');
+            document.getElementById('success').classList.remove('active');
         }
-        
-        // Update hospital info display
-        function updateHospitalInfo() {
-            const hospitalInfo = document.getElementById('hospitalInfo');
-            const noHospitalMessage = document.getElementById('noHospitalMessage');
+
+        function clearDisplayData() {
+            document.getElementById('totalUsers').textContent = '0';
+            document.getElementById('totalFiles').textContent = '0';
+            document.getElementById('totalDuration').textContent = '0h';
+            document.getElementById('avgDuration').textContent = '0m';
+            document.getElementById('userList').innerHTML = '';
             
-            if (currentHospital) {
-                const hospital = hospitals.find(h => h.value === currentHospital);
-                hospitalInfo.textContent = `📊 Viewing data for: ${hospital ? hospital.name : currentHospital}`;
-                hospitalInfo.style.display = 'block';
-                noHospitalMessage.style.display = 'none';
-            } else {
-                hospitalInfo.style.display = 'none';
-                noHospitalMessage.style.display = 'block';
+            if (chartInstance) {
+                chartInstance.destroy();
+                chartInstance = null;
             }
         }
-        
-        // Initialize date inputs with default values
-        function initializeDates() {
-            const today = new Date();
-            const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-            
-            document.getElementById('endDate').value = today.toISOString().split('T')[0];
-            document.getElementById('startDate').value = oneWeekAgo.toISOString().split('T')[0];
+
+        function showLoading(show) {
+            document.getElementById('loading').classList.toggle('active', show);
         }
-        
-        // Handle mode changes
-        document.getElementById('modeSelect').addEventListener('change', function() {
-            const mode = this.value;
-            const viewOnlyElements = document.querySelectorAll('.view-only');
-            viewOnlyElements.forEach(el => {
-                el.style.display = mode === 'view' ? 'flex' : 'none';
-            });
-            document.getElementById('refreshData').textContent = mode === 'preload' ? '🚀 Preload Data' : '🚀 Load All Data';
-            document.getElementById('usernameMode').dispatchEvent(new Event('change'));
-        });
-        
-        // Handle username mode changes (view mode only)
-        document.getElementById('usernameMode').addEventListener('change', function() {
-            const mode = document.getElementById('modeSelect').value;
-            if (mode !== 'view') return;
-            
-            const usernameMode = this.value;
-            const singleGroup = document.getElementById('singleUserGroup');
-            const multipleGroup = document.getElementById('multipleUserGroup');
-            const processingGroup = document.getElementById('processingModeGroup');
-            
-            // Hide all groups first
-            singleGroup.style.display = 'none';
-            multipleGroup.style.display = 'none';
-            processingGroup.style.display = 'none';
-            
-            // Show relevant groups based on mode
-            switch (usernameMode) {
-                case 'single':
-                    singleGroup.style.display = 'flex';
-                    break;
-                case 'multiple':
-                    multipleGroup.style.display = 'flex';
-                    processingGroup.style.display = 'flex';
-                    break;
-                case 'all':
-                    // No additional controls needed
-                    break;
+
+        function showError(message) {
+            const errorEl = document.getElementById('error');
+            errorEl.textContent = message;
+            errorEl.classList.add('active');
+        }
+
+        function showSuccess(message) {
+            const successEl = document.getElementById('success');
+            successEl.textContent = message;
+            successEl.classList.add('active');
+        }
+
+        // PRE-LOAD MODE: Load and save monthly data
+        async function preloadMonthlyData() {
+            if (!currentHospital) {
+                showError('Please select a hospital first');
+                return;
             }
-        });
-        
-        // AUTO-BATCHING: Automatically load all batches until complete
-        async function loadAllDataWithAutoBatching(startDate, endDate, hospitalFolder, action) {
-            const loading = document.getElementById('loading');
-            const error = document.getElementById('error');
-            const processingInfo = document.getElementById('processingInfo');
-            const batchProgress = document.getElementById('batchProgress');
-            const refreshButton = document.getElementById('refreshData');
+
+            const monthInput = document.getElementById('preloadMonth').value;
+            if (!monthInput) {
+                showError('Please select a month');
+                return;
+            }
+
+            const [year, month] = monthInput.split('-');
+            const startDate = new Date(year, month - 1, 1);
+            const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
+            showLoading(true);
+            clearMessages();
             
-            // Reset accumulated data
-            allAccumulatedFiles = [];
-            allUserStats = {};
-            isLoadingBatches = true;
-            
-            // Show loading states
-            loading.classList.add('active');
-            error.classList.remove('active');
-            processingInfo.style.display = 'none';
-            batchProgress.classList.add('active');
-            refreshButton.disabled = true;
-            refreshButton.textContent = '⏳ Loading...';
-            
-            let currentBatch = 1;
-            let hasMoreBatches = true;
-            let totalFiles = 0;
-            let totalBatches = 1;
-            
+            const statusPanel = document.getElementById('preloadStatus');
+            statusPanel.style.display = 'block';
+            document.getElementById('preloadStatusText').textContent = 'Loading...';
+            document.getElementById('preloadFilesCount').textContent = '0';
+            document.getElementById('preloadUsersCount').textContent = '0';
+
             try {
-                const usernameMode = document.getElementById('usernameMode').value;
-                console.log('🚀 Starting auto-batching process:', { hospitalFolder, startDate, endDate, usernameMode, action });
+                console.log('Pre-loading data for:', { hospital: currentHospital, month: monthInput });
                 
-                while (hasMoreBatches && isLoadingBatches) {
-                    console.log(`📦 Loading batch ${currentBatch}...`);
-                    
-                    // Update progress UI
-                    updateBatchProgress(currentBatch, totalBatches, allAccumulatedFiles.length, totalFiles, `Loading batch ${currentBatch}...`);
-                    
-                    let response;
-                    
-                    // Choose the appropriate API call based on mode and action
-                    const options = {
-                        hospital: hospitalFolder,
-                        startDate: startDate.toISOString(),
-                        endDate: endDate.toISOString(),
-                        batchNumber: currentBatch
-                    };
-                    
-                    if (action === 'view-preloaded') {
-                        options.usernameMode = usernameMode;
-                        if (usernameMode === 'single') {
-                            options.username = document.getElementById('usernameFilter').value.trim();
-                        } else if (usernameMode === 'multiple') {
-                            const usernamesText = document.getElementById('usernamesList').value.trim();
-                            options.usernames = usernamesText.split('\n').map(u => u.trim()).filter(u => u.length > 0);
-                            options.processingMode = document.getElementById('processingMode').value;
-                        }
-                        // for 'all', no additional options
-                    } // for preload-months, no username options
-                    
-                    response = await apiRequest(action, options);
-                    
-                    console.log(`📦 Batch ${currentBatch} response:`, response);
-                    
-                    if (!response || !Array.isArray(response.files)) {
-                        throw new Error('Invalid API response: files array missing');
-                    }
-                    
-                    // Add files from this batch to accumulated data
-                    allAccumulatedFiles.push(...response.files);
-                    
-                    // Update batch info from response
-                    if (response.batchInfo) {
-                        totalBatches = response.batchInfo.totalBatches || totalBatches;
-                        totalFiles = response.batchInfo.totalFilesFound || response.totalAvailable || totalFiles;
-                        hasMoreBatches = response.batchInfo.hasMoreBatches || response.hasMoreBatches || false;
-                    } else {
-                        hasMoreBatches = false; // Fallback if no batch info
-                    }
-                    
-                    // Accumulate user statistics
-                    accumulateUserStats(response.files);
-                    
-                    // Update progress
-                    const progressPercentage = totalFiles > 0 ? Math.round((allAccumulatedFiles.length / totalFiles) * 100) : 100;
-                    updateBatchProgress(currentBatch, totalBatches, allAccumulatedFiles.length, totalFiles, 
-                        hasMoreBatches ? `Loaded batch ${currentBatch} of ${totalBatches}` : 'All batches loaded!', progressPercentage);
-                    
-                    // Show processing stats from the latest batch
-                    showProcessingStats(response, usernameMode, currentBatch, totalBatches, action);
-                    
-                    // Update UI with accumulated data after each batch
-                    updateUIWithAccumulatedData();
-                    
-                    console.log(`✅ Batch ${currentBatch} complete: ${response.files.length} files added, ${allAccumulatedFiles.length} total accumulated`);
-                    
-                    // Move to next batch
-                    currentBatch++;
-                    
-                    // Small delay to prevent overwhelming the API
-                    if (hasMoreBatches) {
-                        await new Promise(resolve => setTimeout(resolve, 100));
-                    }
-                }
-                
-                console.log('🎉 All batches loaded successfully!', {
-                    totalBatches: currentBatch - 1,
-                    totalFiles: allAccumulatedFiles.length,
-                    totalUsers: Object.keys(allUserStats).length
+                const response = await apiRequest('preload-monthly-data', {
+                    hospital: currentHospital,
+                    year: parseInt(year),
+                    month: parseInt(month)
                 });
-                
-                // Final UI update
-                updateBatchProgress(currentBatch - 1, totalBatches, allAccumulatedFiles.length, totalFiles, 
-                    `✅ Complete! Loaded ${allAccumulatedFiles.length} files from ${currentBatch - 1} batches`, 100);
-                
-                // Hide batch progress after a delay
-                setTimeout(() => {
-                    batchProgress.classList.remove('active');
-                }, 3000);
-                
-                if (allAccumulatedFiles.length === 0) {
-                    document.getElementById('error').textContent = 'No audio files found for the selected criteria';
-                    document.getElementById('error').classList.add('active');
-                } else {
-                    document.getElementById('error').classList.remove('active');
-                }
+
+                document.getElementById('preloadStatusText').textContent = 'Completed';
+                document.getElementById('preloadFilesCount').textContent = response.totalFiles || 0;
+                document.getElementById('preloadUsersCount').textContent = response.totalUsers || 0;
+
+                showSuccess(`✅ Successfully pre-loaded and saved data for ${monthInput}: ${response.totalFiles} files, ${response.totalUsers} users`);
                 
             } catch (err) {
-                console.error('Auto-batching error:', err);
-                error.textContent = `Error loading data: ${err.message}`;
-                error.classList.add('active');
-                batchProgress.classList.remove('active');
+                console.error('Pre-load error:', err);
+                showError(`Failed to pre-load data: ${err.message}`);
+                document.getElementById('preloadStatusText').textContent = 'Failed';
             } finally {
-                loading.classList.remove('active');
-                refreshButton.disabled = false;
-                refreshButton.textContent = document.getElementById('modeSelect').value === 'preload' ? '🚀 Preload Data' : '🚀 Load All Data';
-                isLoadingBatches = false;
+                showLoading(false);
             }
         }
-        
-        // Accumulate user statistics from each batch
-        function accumulateUserStats(files) {
-            for (const fileInfo of files) {
-                const username = fileInfo.username || 'Unknown';
-                const duration = fileInfo.duration || 0;
-                const fileDate = new Date(fileInfo.recordingDate || fileInfo.lastModified);
-                
-                if (!allUserStats[username]) {
-                    allUserStats[username] = {
-                        totalDuration: 0,
-                        fileCount: 0,
-                        files: []
-                    };
-                }
-                
-                allUserStats[username].totalDuration += duration;
-                allUserStats[username].fileCount += 1;
-                allUserStats[username].files.push({
-                    filename: fileInfo.filename,
-                    duration: duration,
-                    date: fileDate
+
+        // VIEW MODE: Load pre-aggregated data
+        async function loadViewData() {
+            if (!currentHospital) {
+                showError('Please select a hospital first');
+                return;
+            }
+
+            const startDate = document.getElementById('viewStartDate').value;
+            const endDate = document.getElementById('viewEndDate').value;
+
+            if (!startDate || !endDate) {
+                showError('Please select both start and end dates');
+                return;
+            }
+
+            const username = document.getElementById('viewUsername').value.trim() || null;
+
+            showLoading(true);
+            clearMessages();
+            clearDisplayData();
+
+            try {
+                console.log('Loading view data:', { hospital: currentHospital, startDate, endDate, username });
+
+                const response = await apiRequest('view-aggregated-data', {
+                    hospital: currentHospital,
+                    startDate,
+                    endDate,
+                    username
                 });
-            }
-        }
-        
-        // Update batch progress UI
-        function updateBatchProgress(currentBatch, totalBatches, loadedFiles, totalFiles, statusText, progressPercentage = null) {
-            document.getElementById('currentBatchNum').textContent = currentBatch;
-            document.getElementById('totalBatchesNum').textContent = totalBatches;
-            document.getElementById('loadedFilesNum').textContent = loadedFiles;
-            document.getElementById('totalFilesNum').textContent = totalFiles;
-            document.getElementById('batchStatusText').textContent = statusText;
-            document.getElementById('batchProgressText').textContent = `${loadedFiles} / ${totalFiles} files loaded`;
-            
-            if (progressPercentage !== null) {
-                const batchBar = document.getElementById('batchBar');
-                batchBar.style.width = `${progressPercentage}%`;
-                
-                if (progressPercentage >= 100) {
-                    batchBar.classList.remove('pulsing');
-                    batchBar.style.background = 'linear-gradient(135deg, #43a047, #66bb6a)';
-                }
-            }
-        }
-        
-        // Update UI with accumulated data
-        function updateUIWithAccumulatedData() {
-            const totalFiles = allAccumulatedFiles.length;
-            const totalDuration = Object.values(allUserStats).reduce((sum, user) => sum + user.totalDuration, 0);
-            const userCount = Object.keys(allUserStats).length;
-            
-            updateStats(allUserStats, totalFiles, totalDuration);
-            updateChart(allUserStats);
-            createUserCards(allUserStats);
-        }
-        
-        // Show processing statistics
-        function showProcessingStats(response, usernameMode, currentBatch, totalBatches, action) {
-            const processingInfo = document.getElementById('processingInfo');
-            let optimizationText;
-            let cssClass;
-            
-            if (action === 'preload-months') {
-                optimizationText = `🔄 PRELOAD: Processed ${response.preloadStats.monthsProcessed} months | Saved ${response.preloadStats.totalFilesSaved} files`;
-                cssClass = 'processing-info optimized';
-            } else if (usernameMode === 'multiple' && response.multiUserStats) {
-                const stats = response.multiUserStats;
-                const efficiency = parseInt(stats.efficiency);
-                
-                if (stats.ultraFastPrefixFiltering) {
-                    optimizationText = `🚀 MULTI-USER ULTRA-FAST AUTO-BATCHING: Batch ${currentBatch}/${totalBatches} | Processed ${stats.usersProcessed} users | Found ${stats.matchingFiles} files | ${stats.s3ApiCalls} S3 calls | ${stats.efficiency} efficiency`;
-                    cssClass = 'processing-info ultra-optimized';
+
+                if (response.files && response.files.length > 0) {
+                    processAndDisplayData(response.files);
+                    showSuccess(`✅ Loaded ${response.files.length} files from pre-aggregated data`);
                 } else {
-                    optimizationText = `⚡ MULTI-USER AUTO-BATCHING: Batch ${currentBatch}/${totalBatches} | Processed ${stats.usersProcessed} users | ${stats.efficiency} efficiency`;
-                    cssClass = 'processing-info optimized';
+                    showError('No data found for the selected period. Please pre-load the data first.');
                 }
-            } else if (response.optimizationStats) {
-                const stats = response.optimizationStats;
-                const efficiency = parseInt(stats.efficiency);
-                
-                if (stats.trueS3PrefixFiltering) {
-                    optimizationText = `🎯 AUTO-BATCHING: Batch ${currentBatch}/${totalBatches} | S3 prefix filtering | Found ${stats.matchingFiles} matches | ${stats.efficiency} efficiency`;
-                    cssClass = 'processing-info ultra-optimized';
-                } else {
-                    optimizationText = `📊 AUTO-BATCHING: Batch ${currentBatch}/${totalBatches} | Found ${stats.matchingFiles} matches | ${stats.efficiency} efficiency`;
-                    cssClass = 'processing-info optimized';
-                }
-            } else {
-                optimizationText = `🔄 AUTO-BATCHING: Processing batch ${currentBatch} of ${totalBatches}...`;
-                cssClass = 'processing-info';
+
+            } catch (err) {
+                console.error('View data error:', err);
+                showError(`Failed to load data: ${err.message}`);
+            } finally {
+                showLoading(false);
             }
-            
-            processingInfo.textContent = optimizationText;
-            processingInfo.className = cssClass;
-            processingInfo.style.display = 'block';
         }
-        
-        // Update statistics display
+
+        function processAndDisplayData(files) {
+            const userStats = {};
+
+            files.forEach(fileInfo => {
+                const username = fileInfo.username || 'Unknown';
+                if (!userStats[username]) {
+                    userStats[username] = { totalDuration: 0, fileCount: 0 };
+                }
+                userStats[username].totalDuration += fileInfo.duration || 0;
+                userStats[username].fileCount += 1;
+            });
+
+            const totalFiles = files.length;
+            const totalDuration = Object.values(userStats).reduce((sum, user) => sum + user.totalDuration, 0);
+            const userCount = Object.keys(userStats).length;
+
+            updateStats(userStats, totalFiles, totalDuration);
+            updateChart(userStats);
+            createUserCards(userStats);
+        }
+
         function updateStats(userStats, totalFiles, totalDuration) {
             const userCount = Object.keys(userStats).length;
             const totalHours = Math.floor(totalDuration / 3600);
             const totalMinutes = Math.floor((totalDuration % 3600) / 60);
             const avgDurationPerUser = userCount > 0 ? totalDuration / userCount : 0;
             const avgMinutes = Math.round(avgDurationPerUser / 60);
-            
+
             document.getElementById('totalUsers').textContent = userCount;
             document.getElementById('totalFiles').textContent = totalFiles;
             document.getElementById('totalDuration').textContent = totalHours > 0 ? `${totalHours}h ${totalMinutes}m` : `${totalMinutes}m`;
             document.getElementById('avgDuration').textContent = `${avgMinutes}m`;
         }
-        
-        // Create or update chart
+
         function updateChart(userStats) {
             const ctx = document.getElementById('durationChart').getContext('2d');
-            
-            // Prepare data for chart
-            const users = Object.keys(userStats).sort((a, b) => 
-                userStats[b].totalDuration - userStats[a].totalDuration
-            );
-            
-            const durations = users.map(user => Math.round(userStats[user].totalDuration / 60)); // in minutes
-            
-            // Generate colors
-            const colors = users.map((_, index) => {
-                const hue = (index * 137.5) % 360;
-                return `hsla(${hue}, 70%, 60%, 0.8)`;
-            });
-            
-            // Destroy existing chart
-            if (chartInstance) {
-                chartInstance.destroy();
-            }
-            
+            const users = Object.keys(userStats).sort((a, b) => userStats[b].totalDuration - userStats[a].totalDuration);
+            const durations = users.map(user => Math.round(userStats[user].totalDuration / 60));
+            const colors = users.map((_, i) => `hsla(${(i * 137.5) % 360}, 70%, 60%, 0.8)`);
+
+            if (chartInstance) chartInstance.destroy();
+
             chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -1080,80 +673,35 @@
                         label: 'Duration (minutes)',
                         data: durations,
                         backgroundColor: colors,
-                        borderColor: colors.map(color => color.replace('0.8', '1')),
+                        borderColor: colors.map(c => c.replace('0.8', '1')),
                         borderWidth: 2,
-                        borderRadius: 8,
-                        borderSkipped: false,
+                        borderRadius: 8
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const username = context.label;
-                                    const duration = context.raw;
-                                    const fileCount = userStats[username].fileCount;
-                                    return [
-                                        `Duration: ${duration} minutes`,
-                                        `Files: ${fileCount}`,
-                                        `Avg per file: ${Math.round(duration / fileCount)} min`
-                                    ];
-                                }
-                            }
-                        }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Duration (minutes)'
-                            },
-                            grid: {
-                                color: 'rgba(0,0,0,0.1)'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Users'
-                            },
-                            grid: {
-                                display: false
-                            }
-                        }
+                        y: { beginAtZero: true, title: { display: true, text: 'Duration (minutes)' } },
+                        x: { title: { display: true, text: 'Users' } }
                     }
                 }
             });
         }
-        
-        // Create user cards
+
         function createUserCards(userStats) {
             const userList = document.getElementById('userList');
             userList.innerHTML = '';
-            
-            const sortedUsers = Object.entries(userStats).sort((a, b) => 
-                b[1].totalDuration - a[1].totalDuration
-            );
-            
-            sortedUsers.forEach(([username, stats]) => {
-                const card = document.createElement('div');
-                card.className = 'user-card';
-                
-                                const durationMinutes = Math.round(stats.totalDuration / 60);
+
+            Object.entries(userStats).sort((a, b) => b[1].totalDuration - a[1].totalDuration).forEach(([username, stats]) => {
+                const durationMinutes = Math.round(stats.totalDuration / 60);
                 const durationHours = Math.floor(durationMinutes / 60);
                 const remainingMinutes = durationMinutes % 60;
-                
-                const displayDuration = durationHours > 0 
-                    ? `${durationHours}h ${remainingMinutes}m`
-                    : `${durationMinutes}m`;
-                
+                const displayDuration = durationHours > 0 ? `${durationHours}h ${remainingMinutes}m` : `${durationMinutes}m`;
+
+                const card = document.createElement('div');
+                card.className = 'user-card';
                 card.innerHTML = `
                     <div class="user-name">${username}</div>
                     <div class="user-stats">
@@ -1161,127 +709,29 @@
                         <div class="file-count">${stats.fileCount} files</div>
                     </div>
                 `;
-                
                 userList.appendChild(card);
             });
         }
-        
-        // Main refresh function with mode support
-        async function refreshData() {
-            if (!currentHospital) {
-                alert('Please select a hospital first');
-                return;
-            }
-            
-            const startDateStr = document.getElementById('startDate').value;
-            const endDateStr = document.getElementById('endDate').value;
-            const mode = document.getElementById('modeSelect').value;
-            
-            if (!startDateStr || !endDateStr) {
-                alert('Please select both start and end dates');
-                return;
-            }
-            
-            if (new Date(startDateStr) > new Date(endDateStr)) {
-                alert('Start date must be before end date');
-                return;
-            }
-            
-            const startDate = new Date(startDateStr);
-            const endDate = new Date(endDateStr);
-            endDate.setHours(23, 59, 59, 999);
-            
-            console.log('Starting data operation:', { mode, currentHospital, startDate, endDate });
-            
-            // Clear previous data
-            clearDisplayData();
-            
-            let action;
-            if (mode === 'preload') {
-                action = 'preload-months';
-            } else { // view
-                action = 'view-preloaded';
-            }
-            
-            // Start auto-batching process
-            await loadAllDataWithAutoBatching(startDate, endDate, currentHospital, action);
-        }
-        
+
         // Event listeners
-        document.getElementById('refreshData').addEventListener('click', refreshData);
-        
         document.getElementById('hospitalSelect').addEventListener('change', function() {
             currentHospital = this.value;
-            updateHospitalInfo();
-            
-            // Clear previous data when switching hospitals
-            if (currentHospital) {
-                clearDisplayData();
-            }
+            clearDisplayData();
+            clearMessages();
         });
-        
-        // Clear display data helper
-        function clearDisplayData() {
-            document.getElementById('totalUsers').textContent = '0';
-            document.getElementById('totalFiles').textContent = '0';
-            document.getElementById('totalDuration').textContent = '0h';
-            document.getElementById('avgDuration').textContent = '0m';
-            document.getElementById('userList').innerHTML = '';
-            document.getElementById('processingInfo').style.display = 'none';
-            document.getElementById('batchProgress').classList.remove('active');
-            
-            allAccumulatedFiles = [];
-            allUserStats = {};
-            
-            if (chartInstance) {
-                chartInstance.destroy();
-                chartInstance = null;
-            }
-        }
-        
-        // Add Hospital Modal functionality (unchanged)
-        document.getElementById('addHospitalBtn').addEventListener('click', function() {
-            document.getElementById('addHospitalModal').classList.add('active');
-            document.getElementById('hospitalNameInput').focus();
-        });
-        
-        document.getElementById('cancelAddHospital').addEventListener('click', function() {
-            document.getElementById('addHospitalModal').classList.remove('active');
-            document.getElementById('hospitalNameInput').value = '';
-        });
-        
-        document.getElementById('confirmAddHospital').addEventListener('click', function() {
-            const hospitalName = document.getElementById('hospitalNameInput').value.trim();
-            if (hospitalName) {
-                addHospital(hospitalName);
-                document.getElementById('addHospitalModal').classList.remove('active');
-                document.getElementById('hospitalNameInput').value = '';
-            } else {
-                alert('Please enter a hospital name');
-            }
-        });
-        
-        document.getElementById('addHospitalModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.classList.remove('active');
-                document.getElementById('hospitalNameInput').value = '';
-            }
-        });
-        
-        document.getElementById('hospitalNameInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('confirmAddHospital').click();
-            }
-        });
-        
-        // Initialize
-        initializeHospitals();
-        initializeDates();
-        updateHospitalInfo();
-        
-        // Trigger initial mode and username mode setup
-        document.getElementById('modeSelect').dispatchEvent(new Event('change'));
-        document.getElementById('usernameMode').dispatchEvent(new Event('change'));
+
+        document.getElementById('startPreload').addEventListener('click', preloadMonthlyData);
+        document.getElementById('loadViewData').addEventListener('click', loadViewData);
+
+        // Initialize dates
+        const today = new Date();
+        document.getElementById('viewEndDate').value = today.toISOString().split('T')[0];
+        const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+        document.getElementById('viewStartDate').value = oneWeekAgo.toISOString().split('T')[0];
+        document.getElementById('preloadMonth').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+
+        // Show view mode by default
+        switchMode('view');
     </script>
 </body>
 </html>
