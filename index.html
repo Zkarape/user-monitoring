@@ -403,6 +403,7 @@
                         <input type="month" id="preloadMonth" class="date-input">
                     </div>
                     <button id="startPreload" class="action-btn success">💾 Pre-load & Save Month</button>
+                    <button id="loadPreloadedData" class="action-btn">📊 Load Pre-loaded Data</button>
                 </div>
                 <div class="preload-status" id="preloadStatus" style="display: none;">
                     <h3>Pre-load Progress</h3>
@@ -577,6 +578,51 @@
             }
         }
 
+        // LOAD PRE-LOADED DATA: Load the pre-loaded data for viewing in pre-load mode
+        async function loadPreloadedData() {
+            if (!currentHospital) {
+                showError('Please select a hospital first');
+                return;
+            }
+
+            const monthInput = document.getElementById('preloadMonth').value;
+            if (!monthInput) {
+                showError('Please select a month');
+                return;
+            }
+
+            const [year, month] = monthInput.split('-');
+            const startDate = new Date(year, month - 1, 1);
+            const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
+            showLoading(true);
+            clearMessages();
+            clearDisplayData();
+
+            try {
+                console.log('Loading pre-loaded data for:', { hospital: currentHospital, month: monthInput });
+
+                const response = await apiRequest('view-aggregated-data', {
+                    hospital: currentHospital,
+                    startDate: startDate.toISOString(),
+                    endDate: endDate.toISOString()
+                });
+
+                if (response.files && response.files.length > 0) {
+                    processAndDisplayData(response.files);
+                    showSuccess(`✅ Loaded ${response.files.length} files from pre-loaded data for ${monthInput}`);
+                } else {
+                    showError('No pre-loaded data found for this month. Please pre-load it first using the "Pre-load & Save Month" button.');
+                }
+
+            } catch (err) {
+                console.error('Load pre-loaded data error:', err);
+                showError(`Failed to load pre-loaded data: ${err.message}`);
+            } finally {
+                showLoading(false);
+            }
+        }
+
         // VIEW MODE: Load pre-aggregated data
         async function loadViewData() {
             if (!currentHospital) {
@@ -721,6 +767,7 @@
         });
 
         document.getElementById('startPreload').addEventListener('click', preloadMonthlyData);
+        document.getElementById('loadPreloadedData').addEventListener('click', loadPreloadedData);
         document.getElementById('loadViewData').addEventListener('click', loadViewData);
 
         // Initialize dates
