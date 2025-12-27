@@ -459,30 +459,34 @@
             <!-- Replace the whole #preloadModeControls content with this -->
 
             <div id="preloadModeControls" style="display: none;">
-                <div
-                    style="text-align: center; margin-bottom: 20px; color: #444; font-size: 0.95rem; line-height: 1.4;">
-                    <strong>Preparation Mode</strong><br>
-                    Scan audio files for selected month and create fast-loading summary file (JSON)<br>
-                    <small>Do this once per month — or when new files are added</small>
+                <div style="text-align: center; margin: 25px 0; padding: 0 20px;">
+                    <h3 style="color: #444; margin-bottom: 12px;">Preparation Mode</h3>
+                    <p
+                        style="color: #555; font-size: 0.95rem; line-height: 1.45; max-width: 600px; margin: 0 auto 20px;">
+                        Scan all audio files for the selected month and create a fast-loading summary file (JSON).<br>
+                        <strong>Do this once per month — or whenever new files are added.</strong>
+                    </p>
                 </div>
 
-                <div class="date-controls" style="justify-content: center;">
+                <div class="date-controls" style="justify-content: center; flex-wrap: wrap; gap: 20px;">
                     <div class="date-group">
                         <label for="preloadMonth">Month to prepare</label>
                         <input type="month" id="preloadMonth" class="date-input">
                     </div>
 
+                    <!-- The big visible button everyone was missing -->
                     <button id="startPreload" class="action-btn success"
-                        style="padding: 16px 48px; font-size: 1.15rem;">
+                        style="padding: 16px 50px; font-size: 1.2rem; min-width: 280px; margin-top: 8px;">
                         💾 Create / Update Monthly JSON
                     </button>
                 </div>
 
-                <div class="preload-status" id="preloadStatus" style="display: none; margin-top: 30px;">
+                <!-- Keep the status panel (it will appear after clicking) -->
+                <div class="preload-status" id="preloadStatus" style="display: none; margin-top: 35px;">
                     <h3>Processing Status</h3>
                     <div class="status-item">
                         <span class="status-label">Status:</span>
-                        <span class="status-value" id="preloadStatusText">-</span>
+                        <span class="status-value" id="preloadStatusText">Waiting...</span>
                     </div>
                     <div class="status-item">
                         <span class="status-label">Files Found:</span>
@@ -494,6 +498,7 @@
                     </div>
                 </div>
             </div>
+
 
 
             <div class="loading" id="loading">🔍 Loading data...</div>
@@ -555,13 +560,23 @@
             }
 
             function switchMode(mode) {
+                console.log(`Switching to mode: ${mode}`);
                 currentMode = mode;
 
-                document.getElementById('viewModeBtn').classList.toggle('active', mode === 'view');
-                document.getElementById('preloadModeBtn').classList.toggle('active', mode === 'preload');
+                // Safety fallback: make sure clicking the mode buttons works
+                document.getElementById('viewModeBtn')?.addEventListener('click', () => switchMode('view'));
+                document.getElementById('preloadModeBtn')?.addEventListener('click', () => switchMode('preload'));
+                
+                const viewEl = document.getElementById('viewModeControls');
+                const preloadEl = document.getElementById('preloadModeControls');
 
-                document.getElementById('viewModeControls').style.display = mode === 'view' ? 'block' : 'none';
-                document.getElementById('preloadModeControls').style.display = mode === 'preload' ? 'block' : 'none';
+                if (viewEl) viewEl.style.display = mode === 'view' ? 'block' : 'none';
+                if (preloadEl) {
+                    preloadEl.style.display = mode === 'preload' ? 'block' : 'none';
+                    console.log(`Preload controls now: ${preloadEl.style.display}`);
+                } else {
+                    console.error("Preload controls element not found!");
+                }
 
                 clearMessages();
                 clearDisplayData();
